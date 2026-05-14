@@ -27,3 +27,5 @@ flutter:
   assets:
     - assets/money.json
     - assets/growth_chart.json
+    - assets/a.json
+    - assets/payment.json
