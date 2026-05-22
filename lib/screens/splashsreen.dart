@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'dart:async';
+import 'package:lottie/lottie.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -81,24 +82,36 @@ class _SplashScreenState extends State<SplashScreen> {
                 ),
                 const SizedBox(height: 8),
                 const Text(
-                  "Save together, grow together",
+                  "Get money",
                   style: TextStyle(fontSize: 14, color: Colors.grey),
                 ),
                 const SizedBox(height: 24),
-                OutlinedButton(
-                  onPressed: () {},
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: const Size(double.infinity, 50),
+                Hero(
+                  tag: 'signup-button',
+                  child: Material(
+                    color: Colors.transparent,
+                    child: OutlinedButton(
+                      onPressed: () => context.go('/signup'),
+                      style: OutlinedButton.styleFrom(
+                        minimumSize: const Size(double.infinity, 50),
+                      ),
+                      child: const Text("Get Started"),
+                    ),
                   ),
-                  child: const Text("Get Started"),
                 ),
                 const SizedBox(height: 12),
-                OutlinedButton(
-                  onPressed: () {},
-                  style: OutlinedButton.styleFrom(
-                    minimumSize: const Size(double.infinity, 50),
+                Hero(
+                  tag: 'login-button',
+                  child: Material(
+                    color: Colors.transparent,
+                    child: OutlinedButton(
+                      onPressed: () => context.go('/login'),
+                      style: OutlinedButton.styleFrom(
+                        minimumSize: const Size(double.infinity, 50),
+                      ),
+                      child: const Text("Login"),
+                    ),
                   ),
-                  child: const Text("Login"),
                 ),
                 const SizedBox(height: 16),
               ],
