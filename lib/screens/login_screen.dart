@@ -7,7 +7,25 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Login Screen Placeholder")
+      appBar: AppBar(title: const Text("Login"), centerTitle: true,),
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text("Email"),
+            TextField(
+              decoration: InputDecoration(
+                  hintText: 'user@example.com', border: OutlineInputBorder()),
+            ),
+            const SizedBox(height: 20,),
+            Text("Password"),
+            TextField(
+              decoration: InputDecoration(
+                  hintText: 'Password123', border: OutlineInputBorder()),
+            ),
+          ],
+        ),
       ),
     );
   }

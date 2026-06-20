@@ -1,122 +1,121 @@
-import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'dart:async';
-import 'package:lottie/lottie.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
+import 'package:flutter/material.dart';
+import '../services/auth_service.dart';
 
-class SplashScreen extends StatefulWidget {
+class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});
-
-  @override
-  State<SplashScreen> createState() => _SplashScreenState();
-}
-
-class _SplashScreenState extends State<SplashScreen> {
-  Timer? _timer;
-  int _currentPage = 0;
-
-  final List<String> _animations = [
-    'assets/a.json',
-    'assets/growth_chart.json',
-    'assets/payment.json',
-  ];
-
-  @override
-  void initState() {
-    super.initState();
-    _startAutoSlide();
-  }
-
-  void _startAutoSlide() {
-    _timer = Timer.periodic(const Duration(seconds: 3), (timer) {
-      setState(() {
-        _currentPage = (_currentPage + 1) % _animations.length;
-      });
-    });
-  }
-
-  @override
-  void dispose() {
-    _timer?.cancel();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: const Color.fromARGB(245, 245, 245, 242),
-        title: const Text("SuSuPlus"),
-      ),
-      body: Column(
+      body: Stack(
+        fit: StackFit.expand,
         children: [
-          Expanded(
-            child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 600),
-              transitionBuilder: (child, animation) => FadeTransition(
-                opacity: animation,
-                child: ScaleTransition(
-                  scale: Tween<double>(begin: 0.85, end: 1.0).animate(
-                    CurvedAnimation(
-                      parent: animation,
-                      curve: Curves.easeOutBack,
-                    ),
-                  ),
-                  child: child,
+          Image.asset(
+            'assets/images/final.jpg',
+            fit: BoxFit.fitWidth,
+            alignment: Alignment.topCenter,
+          ),
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              padding: const EdgeInsets.only(
+                  top: 24, left: 20, right: 20, bottom: 20),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.vertical(
+                  top: Radius.circular(20),
                 ),
               ),
-              child: Lottie.asset(
-                _animations[_currentPage],
-                key: ValueKey(_currentPage),
+              child: SafeArea(
+                top: false,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Image.asset(
+                      'assets/images/atom.png',
+                      width: 30,
+                      height: 30,
+                    ),
+                    const SizedBox(height: 12),
+                    const Text(
+                      'Get Started',
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    const Text(
+                      'SusuPlus is a digital susu and group savings platform with MoMo integration, automated contributions, transparent ledgers.',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    SignInWithAppleButton(
+                      onPressed: () {context.go('/login');},
+                      height: 50, //
+                      borderRadius: const BorderRadius.all(Radius.circular(15)),
+                      text: 'Continue with Apple',
+                    ),
+                    const SizedBox(height: 12),
+                    ElevatedButton(
+                      onPressed: () { context.go('/login');},
+                      style: ElevatedButton.styleFrom(
+                        foregroundColor: Colors.black,
+                        backgroundColor: Colors.white,
+                        minimumSize: const Size(double.infinity, 50),
+                        side: const BorderSide(color: Color(0xFFDADCE0)),
+                        elevation: 0,
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(15)),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Image.asset(
+                            'assets/images/g_logo.png',
+                            height: 20,
+                          ),
+                          const SizedBox(width: 12),
+                          const Text(
+                            'Continue with Google',
+                            style: TextStyle(
+                              fontSize: 19,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 8,
+                    ),
+                    SizedBox(
+                      width: 400,
+                      height: 50,
+                      child: Container(
+                          decoration: BoxDecoration(borderRadius: BorderRadius.circular(0)),
+                          child: ElevatedButton(
+                            style: ButtonStyle(),
+                              onPressed: () {
+                                context.go('/login');
+                              },
+                              child: Text("Login"))),
+                    )
+                  ],
+                ),
               ),
             ),
-          ),
-
-          // Text and buttons
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-            child: Column(
-              children: [
-                const Text(
-                  "Welcome to SuSuPlus",
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 8),
-                const Text(
-                  "Get money",
-                  style: TextStyle(fontSize: 14, color: Colors.grey),
-                ),
-                const SizedBox(height: 24),
-                Hero(
-                  tag: 'signup-button',
-                  child: Material(
-                    color: Colors.transparent,
-                    child: OutlinedButton(
-                      onPressed: () => context.go('/signup'),
-                      style: OutlinedButton.styleFrom(
-                        minimumSize: const Size(double.infinity, 50),
-                      ),
-                      child: const Text("Get Started"),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Hero(
-                  tag: 'login-button',
-                  child: Material(
-                    color: Colors.transparent,
-                    child: OutlinedButton(
-                      onPressed: () => context.go('/login'),
-                      style: OutlinedButton.styleFrom(
-                        minimumSize: const Size(double.infinity, 50),
-                      ),
-                      child: const Text("Login"),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-              ],
-            ),
-          ),
+          )
         ],
       ),
     );

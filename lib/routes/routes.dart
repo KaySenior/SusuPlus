@@ -4,20 +4,27 @@ import '../screens/onboarding_screen.dart';
 import '../screens/signup_screen.dart';
 import '../screens/login_screen.dart';
 import '../screens/splashsreen.dart';
+import '../screens/homepage.dart';
+import '../screens/registration_screen.dart';
+import '../widgets/404_widget.dart';
+
 
 
 class AppRoutes {
   AppRoutes._();
   static const String home = '/';
   static const String login = '/login';
-  static const String signup = '/signup';
+  static const String registration = '/registration';
   static const String homepage = '/homepage';
+  static const String error = '/error';
 }
 
 final GoRouter appRouter = GoRouter(
   initialLocation: AppRoutes.home,
   routes:[
   GoRoute(path: AppRoutes.home, builder: (BuildContext context, GoRouterState state) => const SplashScreen()),
-  GoRoute(path:AppRoutes.login, builder:(BuildContext context, GoRouterState state) => const LoginScreen()) 
+  GoRoute(path:AppRoutes.login, builder:(BuildContext context, GoRouterState state) => const LoginScreen()),
+  GoRoute(path: AppRoutes.registration, builder: (BuildContext context, GoRouterState state) => Registration()),
+  GoRoute(path: AppRoutes.homepage, builder: (BuildContext context, GoRouterState state)=>  HomeScreen()) 
   ],
 );
