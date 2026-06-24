@@ -103,7 +103,7 @@ class SplashScreen extends StatelessWidget {
                       width: 400,
                       height: 50,
                       child: Container(
-                          decoration: BoxDecoration(borderRadius: BorderRadius.circular(0)),
+                        //  decoration: BoxDecoration(borderRadius: BorderRadius.circular(0)),
                           child: ElevatedButton(
                             style: ButtonStyle(),
                               onPressed: () {

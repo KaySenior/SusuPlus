@@ -24,6 +24,10 @@ class LoginScreen extends StatelessWidget {
               decoration: InputDecoration(
                   hintText: 'Password123', border: OutlineInputBorder()),
             ),
+            
+            ElevatedButton(onPressed: (){
+              context.go('/homepage');
+            }, style: ButtonStyle(), child: Text("Continue"))
           ],
         ),
       ),
