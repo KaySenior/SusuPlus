@@ -7,6 +7,34 @@ class AuthService {
   static final FirebaseAuth _auth = FirebaseAuth.instance;
   static final GoogleSignIn _googleSignIn = GoogleSignIn();
 
+  //! Create a user with email 
+  final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
+
+  User? get currentUser => firebaseAuth.currentUser;
+
+  Stream<User?> get authStateChanges => firebaseAuth.authStateChanges();
+
+  Future<UserCredential> signIn({
+    required String email,
+    required String password,
+  }) async {
+    return await firebaseAuth.signInWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
+  }
+
+  Future<UserCredential> createAccount({
+    required String email,
+    required String password,
+  }) async {
+    return await firebaseAuth.createUserWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
+  }
+
+
   //! Sign in with Google
   static Future<User?> signInWithGoogle() async {
     try {
@@ -67,5 +95,5 @@ class AuthService {
   }
 
   //! Get user stream for state management
-  static Stream<User?> get authStateChanges => _auth.authStateChanges();
+ // static Stream<User?> get authStateChanges => _auth.authStateChanges();
 } 

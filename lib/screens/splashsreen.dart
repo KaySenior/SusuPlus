@@ -60,14 +60,18 @@ class SplashScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 24),
                     SignInWithAppleButton(
-                      onPressed: () {context.go('/login');},
+                      onPressed: () {
+                        context.go('/login');
+                      },
                       height: 50, //
                       borderRadius: const BorderRadius.all(Radius.circular(15)),
                       text: 'Continue with Apple',
                     ),
                     const SizedBox(height: 12),
                     ElevatedButton(
-                      onPressed: () { context.go('/login');},
+                      onPressed: () {
+                        context.go('/login');
+                      },
                       style: ElevatedButton.styleFrom(
                         foregroundColor: Colors.black,
                         backgroundColor: Colors.white,
@@ -103,14 +107,31 @@ class SplashScreen extends StatelessWidget {
                       width: 400,
                       height: 50,
                       child: Container(
-                        //  decoration: BoxDecoration(borderRadius: BorderRadius.circular(0)),
                           child: ElevatedButton(
-                            style: ButtonStyle(),
+                              style: ElevatedButton.styleFrom(
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(15)),
+                                      backgroundColor: Color(0xFFCBCBCB),
+                                      foregroundColor: Colors.black,
+                                      ),
                               onPressed: () {
                                 context.go('/login');
                               },
-                              child: Text("Login"))),
-                    )
+                              child: Text("Continue with Email", style: TextStyle(fontSize: 19),))),
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    Row(
+                      children: [
+                        Text(
+                          "By continuing you agree to Susu's",
+                          style: TextStyle(fontWeight: FontWeight(250)),
+                        ),
+                        Text("Terms of Use",
+                            style: TextStyle(fontWeight: FontWeight(500)))
+                      ],
+                    ),
                   ],
                 ),
               ),

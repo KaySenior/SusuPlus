@@ -9,9 +9,10 @@ environment:
   sdk: ">=3.0.0 <4.0.0"
 
 dependencies:
+  flutter_native_splash: ^2.4.0
   flutter:
     sdk: flutter
-  flutter_avif: ^2.0.0  
+   
 
   cupertino_icons: ^1.0.8
   lottie: ^3.1.2
@@ -19,7 +20,7 @@ dependencies:
   firebase_core: ^4.11.0
   firebase_auth: ^6.5.3
   sign_in_with_apple: ^8.1.0
-  google_sign_in: ^7.2.0
+  google_sign_in: ^6.2.1
 
 dev_dependencies:
   flutter_test:
@@ -35,3 +36,10 @@ flutter:
     - assets/images/atom.png
     - assets/images/g_logo.png
     - assets/404.json
+    - assets/loading.json
+
+flutter_native_splash:
+  color: "#ffffff"
+  image: assets/images/final.jpg
+  android: true
+  ios: true
