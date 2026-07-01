@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-
-
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -9,8 +6,10 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Welcome to SusuPlus"), centerTitle: true,
-      backgroundColor: Colors.blueAccent.shade100,
+      appBar: AppBar(
+        title: const Text("Welcome to SusuPlus"),
+        centerTitle: true,
+        backgroundColor: Colors.blueAccent.shade100,
       ),
       drawer: SafeArea(
         child: Drawer(
@@ -52,7 +51,8 @@ class _ModuleState extends State<Module> {
       height: 200,
       child: Column(
         children: [
-          Text("Your balance is", style: TextStyle(fontSize: 15, fontWeight: FontWeight.w400)),
+          Text("Your balance is",
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w400)),
         ],
       ),
     );

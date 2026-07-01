@@ -1,7 +1,6 @@
 import 'package:go_router/go_router.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:flutter/material.dart';
-import '../services/auth_service.dart';
 
 class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});
@@ -109,15 +108,18 @@ class SplashScreen extends StatelessWidget {
                       child: Container(
                           child: ElevatedButton(
                               style: ElevatedButton.styleFrom(
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(15)),
-                                      backgroundColor: Color(0xFFCBCBCB),
-                                      foregroundColor: Colors.black,
-                                      ),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(15)),
+                                backgroundColor: Color(0xFFCBCBCB),
+                                foregroundColor: Colors.black,
+                              ),
                               onPressed: () {
                                 context.go('/login');
                               },
-                              child: Text("Continue with Email", style: TextStyle(fontSize: 19),))),
+                              child: Text(
+                                "Continue with Email",
+                                style: TextStyle(fontSize: 19),
+                              ))),
                     ),
                     const SizedBox(
                       height: 10,
