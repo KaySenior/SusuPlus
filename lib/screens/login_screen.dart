@@ -236,7 +236,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 ],
               ),
             ),
-            Text("Password"),
             TextField(
               obscureText: true,
               keyboardType: TextInputType.text,
@@ -250,9 +249,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blueGrey),
-                    onPressed: () {
-                      register(); /* context.go('/homepage');*/
-                    },
+                    onPressed: () {},
                     child: Text("Continue"))),
           ],
         ),
