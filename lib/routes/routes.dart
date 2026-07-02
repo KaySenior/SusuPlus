@@ -5,7 +5,7 @@ import '../screens/login_screen.dart';
 import '../screens/homepage.dart';
 import '../screens/settings.dart';
 import '../screens/loading_screen.dart';
-import '../screens/login2.dart';
+import '../screens/splashsreen.dart';
 
 class AppRoutes {
   AppRoutes._();
@@ -15,7 +15,7 @@ class AppRoutes {
   static const String homepage = '/homepage';
   static const String error = '/error';
   static const String settings = '/settings';
-  static const String loading = 'loading';
+  static const String loading = '/loading';
 }
 
 final GoRouter appRouter = GoRouter(
@@ -23,7 +23,8 @@ final GoRouter appRouter = GoRouter(
   routes: [
     GoRoute(
         path: AppRoutes.home,
-        builder: (BuildContext context, GoRouterState state) => const Load()),
+        builder: (BuildContext context, GoRouterState state) =>
+            const SplashScreen()),
     GoRoute(
         path: AppRoutes.login,
         builder: (BuildContext context, GoRouterState state) =>
@@ -38,7 +39,6 @@ final GoRouter appRouter = GoRouter(
         path: AppRoutes.settings,
         builder: (BuildContext context, GoRouterState state) => Settings()),
     GoRoute(
-        path: AppRoutes.settings,
-        builder: (BuildContext context, GoRouterState state) => Load()),]
- 
-);
+        path: AppRoutes.loading,
+        builder: (BuildContext context, GoRouterState state) => const Load()),
+  ],

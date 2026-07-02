@@ -18,9 +18,15 @@ dependencies:
   lottie: ^3.1.2
   go_router: ^17.2.3
   firebase_core: ^4.11.0
-  firebase_auth: ^6.5.3
+  firebase_auth: ^6.5.4
   sign_in_with_apple: ^8.1.0
   google_sign_in: ^6.2.1
+  barcode_widget: ^2.0.4
+  firebase_messaging: ^16.4.1
+  flutter_signin_button: ^2.1.1
+  flutter_facebook_auth: ^7.1.8
+  google_sign_in_dartio: ^0.3.0
+  mockito: ^5.6.4
 
 dev_dependencies:
   flutter_test:
@@ -39,6 +45,7 @@ flutter:
     - assets/images/x.svg
     - assets/404.json
     - assets/loading.json
+    - assets/images/exit.png
 
 flutter_native_splash:
   color: "#ffffff"

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../routes/routes.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -9,6 +8,12 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: Padding(
+          padding: const EdgeInsets.all(7.0),
+          child: CircleAvatar(
+            backgroundColor: Colors.grey,
+          ),
+        ),
         title: Padding(
           padding: const EdgeInsets.all(8.0),
           child: SizedBox(
@@ -45,7 +50,13 @@ class HomeScreen extends StatelessWidget {
             fit: BoxFit.fitWidth,
             alignment: Alignment.topCenter,
           ),
-          Positioned(left: 0, right: 0, bottom: 50, child: ListTile(tileColor: Colors.black,)),
+          Positioned(
+              left: 0,
+              right: 0,
+              bottom: 50,
+              child: ListTile(
+                tileColor: Colors.black,
+              )),
           Positioned(
             bottom: 0,
             left: 0,
@@ -55,7 +66,6 @@ class HomeScreen extends StatelessWidget {
                   top: 24, left: 20, right: 20, bottom: 20),
               decoration: const BoxDecoration(
                 color: Colors.white,
-                
               ),
               child: Column(),
             ),
