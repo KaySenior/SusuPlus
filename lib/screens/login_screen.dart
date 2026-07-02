@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:susu/services/auth_service.dart';
-import '../core/auth_service.dart';
-import 'package:go_router/go_router.dart';
 
 final authService = AuthService();
 
@@ -18,13 +16,13 @@ class _LoginScreenState extends State<LoginScreen> {
   TextEditingController controllerPassword = TextEditingController();
 
   @override
-  void dispose(){
+  void dispose() {
     controllerEmail.dispose();
     controllerPassword.dispose();
     super.dispose();
   }
 
-   void register() async {
+  void register() async {
     final email = controllerEmail.text.trim();
     final password = controllerPassword.text.trim();
 
@@ -73,14 +71,13 @@ class _LoginScreenState extends State<LoginScreen> {
               decoration: InputDecoration(
                   hintText: 'user@example.com', border: OutlineInputBorder()),
               onEditingComplete: () {
-                setState(() {
-                });
+                setState(() {});
               },
             ),
-          
-          
             Text("Password"),
             TextField(
+              obscureText: true,
+              keyboardType: TextInputType.text,
               controller: controllerPassword,
               decoration: InputDecoration(
                   hintText: 'Password123', border: OutlineInputBorder()),
@@ -89,10 +86,17 @@ class _LoginScreenState extends State<LoginScreen> {
                 width: 300,
                 height: 50,
                 child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(backgroundColor: Colors.blueGrey),
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blueGrey),
                     onPressed: () {
+<<<<<<< HEAD
+                      register();
+                      // context.go('/homepage');
+                    },
+=======
                      register();
                      /* context.go('/homepage');*/},
+>>>>>>> b253fb68d3d83850fd5817fdfa83f0c8965a25a3
                     child: Text("Continue"))),
           ],
         ),
