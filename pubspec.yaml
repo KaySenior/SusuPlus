@@ -43,6 +43,7 @@ flutter:
     - assets/images/g_logo.png
     - assets/404.json
     - assets/loading.json
+    - assets/images/exit.png
 
 flutter_native_splash:
   color: "#ffffff"

@@ -11,9 +11,9 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  runApp(
-      // const MyApp()
-      LoginScreen());
+  runApp(const MyApp()
+      // LoginScreen()
+      );
 }
 
 class MyApp extends StatelessWidget {
