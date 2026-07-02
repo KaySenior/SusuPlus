@@ -89,9 +89,14 @@ class _LoginScreenState extends State<LoginScreen> {
                     style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blueGrey),
                     onPressed: () {
+<<<<<<< HEAD
                       register();
                       // context.go('/homepage');
                     },
+=======
+                     register();
+                     /* context.go('/homepage');*/},
+>>>>>>> b253fb68d3d83850fd5817fdfa83f0c8965a25a3
                     child: Text("Continue"))),
           ],
         ),
