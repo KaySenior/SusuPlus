@@ -68,6 +68,7 @@ class _LoginScreenState extends State<LoginScreen> {
           children: [
             Text("Email"),
             TextField(
+              keyboardType: TextInputType.emailAddress,
               controller: controllerEmail,
               decoration: InputDecoration(
                   hintText: 'user@example.com', border: OutlineInputBorder()),
@@ -90,8 +91,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: ElevatedButton(
                     style: ElevatedButton.styleFrom(backgroundColor: Colors.blueGrey),
                     onPressed: () {
-                    //  register();
-                      context.go('/homepage');},
+                     register();
+                     /* context.go('/homepage');*/},
                     child: Text("Continue"))),
           ],
         ),

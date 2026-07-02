@@ -25,7 +25,7 @@ class AppRoutes {
 final GoRouter appRouter = GoRouter(
   initialLocation: AppRoutes.home,
   routes:[
-  GoRoute(path: AppRoutes.home, builder: (BuildContext context, GoRouterState state) => const Load()),
+  GoRoute(path: AppRoutes.home, builder: (BuildContext context, GoRouterState state) => const HomeScreen()),
   GoRoute(path:AppRoutes.login, builder:(BuildContext context, GoRouterState state) => const LoginScreen()),
   GoRoute(path: AppRoutes.registration, builder: (BuildContext context, GoRouterState state) => Registration()),
   GoRoute(path: AppRoutes.homepage, builder: (BuildContext context, GoRouterState state)=>  HomeScreen()),
