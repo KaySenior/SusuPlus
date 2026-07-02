@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 class Registration extends StatefulWidget {
   const Registration({super.key});
 
+  @override
   State<Registration> createState() => _RegistrationState();
 }
 
@@ -48,12 +49,14 @@ class _RegistrationState extends State<Registration> {
                     width: 300,
                     height: 50,
                     child: ElevatedButton(
-                      style: ButtonStyle(
-                        backgroundColor: WidgetStateProperty.all(Colors.tealAccent.shade100),
-                      ),
+                        style: ButtonStyle(
+                          backgroundColor: WidgetStateProperty.all(
+                              Colors.tealAccent.shade100),
+                        ),
                         onPressed: () {
                           context.go('/homepage');
-                        }, child: Text("Confirm"))),
+                        },
+                        child: Text("Confirm"))),
               ),
             ),
           ]),
