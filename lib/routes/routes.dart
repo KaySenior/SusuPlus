@@ -15,7 +15,7 @@ class AppRoutes {
   static const String homepage = '/homepage';
   static const String error = '/error';
   static const String settings = '/settings';
-  static const String loading = 'loading';
+  static const String loading = '/loading';
 }
 
 final GoRouter appRouter = GoRouter(
@@ -39,7 +39,6 @@ final GoRouter appRouter = GoRouter(
         path: AppRoutes.settings,
         builder: (BuildContext context, GoRouterState state) => Settings()),
     GoRoute(
-        path: AppRoutes.settings,
-        builder: (BuildContext context, GoRouterState state) => Load()),
+        path: AppRoutes.loading,
+        builder: (BuildContext context, GoRouterState state) => const Load()),
   ],
-);

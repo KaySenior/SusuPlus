@@ -12,7 +12,7 @@ dependencies:
   flutter_native_splash: ^2.4.0
   flutter:
     sdk: flutter
-   
+  flutter_svg: ^2.0.10 
 
   cupertino_icons: ^1.0.8
   lottie: ^3.1.2
@@ -41,6 +41,8 @@ flutter:
     - assets/images/final.jpg
     - assets/images/atom.png
     - assets/images/g_logo.png
+    - assets/images/arrow-left.svg
+    - assets/images/x.svg
     - assets/404.json
     - assets/loading.json
     - assets/images/exit.png
