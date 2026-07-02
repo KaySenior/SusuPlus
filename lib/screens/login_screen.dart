@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:susu/services/auth_service.dart';
+<<<<<<< HEAD
 import 'package:go_router/go_router.dart';
+=======
+>>>>>>> main
 
 final authService = AuthService();
 
@@ -56,6 +59,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+<<<<<<< HEAD
       resizeToAvoidBottomInset: false,
       //!Also added the resized to prevent the screen from building space for the keyboard which
       //!makes the whole screen raise when you are using keyboardType property in textField
@@ -147,6 +151,48 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
         ],
+=======
+      appBar: AppBar(
+        title: const Text("Login"),
+        centerTitle: true,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text("Email"),
+            TextField(
+              keyboardType: TextInputType.emailAddress,
+              controller: controllerEmail,
+              decoration: InputDecoration(
+                  hintText: 'user@example.com', border: OutlineInputBorder()),
+              onEditingComplete: () {
+                setState(() {});
+              },
+            ),
+            Text("Password"),
+            TextField(
+              obscureText: true,
+              keyboardType: TextInputType.text,
+              controller: controllerPassword,
+              decoration: InputDecoration(
+                  hintText: 'Password123', border: OutlineInputBorder()),
+            ),
+            SizedBox(
+                width: 300,
+                height: 50,
+                child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blueGrey),
+                    onPressed: () {
+                      register();
+                      // context.go('/homepage');
+                    },
+                    child: Text("Continue"))),
+          ],
+        ),
+>>>>>>> main
       ),
     );
   }
