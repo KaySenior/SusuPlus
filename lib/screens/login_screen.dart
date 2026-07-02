@@ -76,7 +76,7 @@ class _LoginScreenState extends State<LoginScreen> {
           children: [
             Container(
               width: double.infinity,
-              height: 635,
+              height: 625,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(25),
@@ -155,7 +155,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   Positioned(
                     left: 8,
                     right: 8,
-                    bottom: 280,
+                    bottom: 270,
                     child: Center(
                       child: Text('Forgot password?',
                           style: TextStyle(
@@ -236,21 +236,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 ],
               ),
             ),
-            TextField(
-              obscureText: true,
-              keyboardType: TextInputType.text,
-              controller: controllerPassword,
-              decoration: InputDecoration(
-                  hintText: 'Password123', border: OutlineInputBorder()),
-            ),
-            SizedBox(
-                width: 300,
-                height: 50,
-                child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blueGrey),
-                    onPressed: () {},
-                    child: Text("Continue"))),
           ],
         ),
       ),
