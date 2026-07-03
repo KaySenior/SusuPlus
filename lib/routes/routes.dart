@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:susu/screens/transfer_screen.dart';
 import '../screens/signup_screen.dart';
 import '../screens/login_screen.dart';
 import '../screens/homepage.dart';
 import '../screens/settings.dart';
 import '../screens/loading_screen.dart';
 import '../screens/splashsreen.dart';
+import '../screens/transfer_screen.dart';
 
 class AppRoutes {
   AppRoutes._();
@@ -26,7 +28,10 @@ final GoRouter appRouter = GoRouter(initialLocation: AppRoutes.home, routes: [
   GoRoute(
       path: AppRoutes.login,
       builder: (BuildContext context, GoRouterState state) =>
-          const LoginScreen()),
+          const LoginScreen()
+
+      // TransferScreen()
+      ),
   GoRoute(
       path: AppRoutes.registration,
       builder: (BuildContext context, GoRouterState state) => Registration()),
