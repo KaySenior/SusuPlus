@@ -236,24 +236,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 ],
               ),
             ),
-            TextField(
-              obscureText: true,
-              keyboardType: TextInputType.text,
-              controller: controllerPassword,
-              decoration: InputDecoration(
-                  hintText: 'Password123', border: OutlineInputBorder()),
-            ),
-            SizedBox(
-                width: 300,
-                height: 50,
-                child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blueGrey),
-                    onPressed: () {
-                      register();
-                      /* context.go('/homepage');*/
-                    },
-                    child: Text("Continue"))),
           ],
         ),
       ),

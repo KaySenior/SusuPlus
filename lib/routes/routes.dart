@@ -18,6 +18,7 @@ class AppRoutes {
   static const String loading = '/loading';
 }
 
+<<<<<<< HEAD
 final GoRouter appRouter = GoRouter(
   initialLocation: AppRoutes.home,
   routes: [
@@ -43,3 +44,27 @@ final GoRouter appRouter = GoRouter(
         builder: (BuildContext context, GoRouterState state) => const Load()),
   ],
 );
+=======
+final GoRouter appRouter = GoRouter(initialLocation: AppRoutes.home, routes: [
+  GoRoute(
+      path: AppRoutes.home,
+      builder: (BuildContext context, GoRouterState state) =>
+          const SplashScreen()),
+  GoRoute(
+      path: AppRoutes.login,
+      builder: (BuildContext context, GoRouterState state) =>
+          const LoginScreen()),
+  GoRoute(
+      path: AppRoutes.registration,
+      builder: (BuildContext context, GoRouterState state) => Registration()),
+  GoRoute(
+      path: AppRoutes.homepage,
+      builder: (BuildContext context, GoRouterState state) => HomeScreen()),
+  GoRoute(
+      path: AppRoutes.settings,
+      builder: (BuildContext context, GoRouterState state) => Settings()),
+  GoRoute(
+      path: AppRoutes.loading,
+      builder: (BuildContext context, GoRouterState state) => const Load()),
+]);
+>>>>>>> 98216a7236d7a18fe3a38085f7534fe3fb4b024d
