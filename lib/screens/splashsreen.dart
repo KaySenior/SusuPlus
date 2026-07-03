@@ -58,68 +58,73 @@ class SplashScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 24),
-                    SignInWithAppleButton(
-                      onPressed: () {
-                        context.go('/login');
-                      },
-                      height: 50, //
-                      borderRadius: const BorderRadius.all(Radius.circular(15)),
-                      text: 'Continue with Apple',
-                    ),
-                    const SizedBox(height: 12),
-                    ElevatedButton(
-                      onPressed: () {
-                        context.go('/login');
-                      },
-                      style: ElevatedButton.styleFrom(
-                        foregroundColor: Colors.black,
-                        backgroundColor: Colors.white,
-                        minimumSize: const Size(double.infinity, 50),
-                        side: const BorderSide(color: Color(0xFFDADCE0)),
-                        elevation: 0,
-                        shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(15)),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        SignInWithAppleButton(
+                          onPressed: () {
+                            context.go('/login');
+                          },
+                          height: 50, //
+                          borderRadius: const BorderRadius.all(Radius.circular(15)),
+                          text: 'Continue with Apple',
                         ),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Image.asset(
-                            'assets/images/g_logo.png',
-                            height: 20,
-                          ),
-                          const SizedBox(width: 12),
-                          const Text(
-                            'Continue with Google',
-                            style: TextStyle(
-                              fontSize: 19,
-                              fontWeight: FontWeight.w500,
+                        const SizedBox(height: 12),
+                        ElevatedButton(
+                          onPressed: () {
+                            context.go('/login');
+                          },
+                          style: ElevatedButton.styleFrom(
+                            foregroundColor: Colors.black,
+                            backgroundColor: Colors.white,
+                            minimumSize: const Size(double.infinity, 50),
+                            side: const BorderSide(color: Color(0xFFDADCE0)),
+                            elevation: 0,
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.all(Radius.circular(15)),
                             ),
                           ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 8,
-                    ),
-                    SizedBox(
-                      width: 400,
-                      height: 50,
-                      child: Container(
-                          child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(15)),
-                                backgroundColor: Color(0xFFCBCBCB),
-                                foregroundColor: Colors.black,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Image.asset(
+                                'assets/images/g_logo.png',
+                                height: 20,
                               ),
-                              onPressed: () {
-                                context.go('/login');
-                              },
-                              child: Text(
-                                "Continue with Email",
-                                style: TextStyle(fontSize: 19),
-                              ))),
+                              const SizedBox(width: 12),
+                              const Text(
+                                'Continue with Google',
+                                style: TextStyle(
+                                  fontSize: 19,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 8,
+                        ),
+                        SizedBox(
+                          width: 400,
+                          height: 50,
+                          child: Container(
+                              child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(15)),
+                                    backgroundColor: Color(0xFFCBCBCB),
+                                    foregroundColor: Colors.black,
+                                  ),
+                                  onPressed: () {
+                                    context.go('/login');
+                                  },
+                                  child: Text(
+                                    "Continue with Email",
+                                    style: TextStyle(fontSize: 19),
+                                  ))),
+                        ),
+                      ],
                     ),
                     const SizedBox(
                       height: 10,
