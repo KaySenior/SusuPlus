@@ -236,8 +236,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 ],
               ),
             ),
-<<<<<<< HEAD
-=======
             TextField(
               obscureText: true,
               keyboardType: TextInputType.text,
@@ -256,7 +254,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       /* context.go('/homepage');*/
                     },
                     child: Text("Continue"))),
->>>>>>> 73d43fa8ea8ae3287b2b4696449c2b2f3574c754
           ],
         ),
       ),

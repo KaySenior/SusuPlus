@@ -42,3 +42,4 @@ final GoRouter appRouter = GoRouter(
         path: AppRoutes.loading,
         builder: (BuildContext context, GoRouterState state) => const Load()),
   ],
+);
