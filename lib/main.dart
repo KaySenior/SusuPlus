@@ -4,6 +4,7 @@ import 'package:susu/routes/routes.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import '../screens/transfer_screen.dart';
+import '../screens/profile_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -14,7 +15,10 @@ void main() async {
   );
 
   runApp(const MyApp()
-);
+
+      // ProfileScreen(),
+      // LoginScreen()
+      );
 }
 
 class MyApp extends StatelessWidget {
