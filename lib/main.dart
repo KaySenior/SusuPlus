@@ -14,11 +14,11 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  runApp(
-    const ProfileScreen(),
-    // MyApp()
-    // LoginScreen()
-  );
+  runApp(const MyApp()
+
+      // ProfileScreen(),
+      // LoginScreen()
+      );
 }
 
 class MyApp extends StatelessWidget {
