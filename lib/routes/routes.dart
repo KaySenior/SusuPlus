@@ -8,6 +8,7 @@ import '../screens/homepage.dart';
 import '../screens/settings.dart';
 import '../screens/loading_screen.dart';
 import '../screens/splashsreen.dart';
+import '../screens/profile_screen.dart';
 
 class AppRoutes {
   AppRoutes._();
@@ -19,6 +20,7 @@ class AppRoutes {
   static const String settings = '/settings';
   static const String loading = '/loading';
   static const String transfer = '/transfer';
+  static const String profile = '/profile';
 }
 
 final GoRouter appRouter = GoRouter(
@@ -47,6 +49,7 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
         path: AppRoutes.transfer,
         builder: (BuildContext context, GoRouterState state) =>
-            TransferScreen())
+            TransferScreen()),
+    GoRoute(path: AppRoutes.profile, builder: (BuildContext context, GoRouterState state)=> ProfileScreen())
   ],
 );

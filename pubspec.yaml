@@ -39,7 +39,6 @@ flutter:
     - assets/images/arrow-left.svg
     - assets/404.json
     - assets/loading.json
-    - assets/images/exit.png
     - assets/images/profileImage.jpg
     - assets/icons/arrowforprofile.png
     - assets/icons/user-circle.png
@@ -47,8 +46,9 @@ flutter:
     - assets/icons/money.png
     - assets/icons/taxes.png
     - assets/icons/cash.png
-    - assets/icons/settings.png
     - assets/icons/accessibility.png
+    - assets/icons/caret-right.svg
+    - assets/images/add_money.png
 
 flutter_native_splash:
   color: "#ffffff"

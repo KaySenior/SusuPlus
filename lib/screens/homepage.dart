@@ -2,16 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:susu/screens/account_screen.dart';
+import 'package:susu/screens/profile_screen.dart';
 import 'package:susu/screens/transaction_screen.dart';
 import 'package:susu/screens/transfer_screen.dart';
 import 'package:susu/widgets/navbar.dart';
 import '../core/notifier.dart';
+
 final List<Widget> pages = [
-    const HomeShell(),
-    const TransferScreen(),
-    const TransactionScreen(),
-    const AccountScreen(),
-  ];
+  const HomeShell(),
+  const TransferScreen(),
+  const TransactionScreen(),
+  const ProfileScreen(),
+];
 
 class HomeTab extends StatelessWidget {
   const HomeTab({super.key});
@@ -55,6 +57,8 @@ class _HomeScreenState extends State<HomeShell> {
                 'assets/icons/list.svg',
                 width: 24,
                 height: 24,
+                colorFilter:
+                              ColorFilter.mode(Colors.blue, BlendMode.srcIn),
               ));
         }),
         actions: [
@@ -62,6 +66,8 @@ class _HomeScreenState extends State<HomeShell> {
             padding: const EdgeInsets.all(8.0),
             child: SvgPicture.asset(
               'assets/icons/bell.svg',
+              colorFilter:
+                              ColorFilter.mode(Colors.blue, BlendMode.srcIn),
               width: 24,
               height: 24,
             ),
@@ -135,7 +141,13 @@ class _HomeScreenState extends State<HomeShell> {
                             ),
                           ],
                         ),
-                        trailing: const Icon(Icons.send),
+                        trailing: SvgPicture.asset(
+                          'assets/icons/caret-right.svg',
+                          width: 24,
+                          height: 24,
+                          colorFilter:
+                              ColorFilter.mode(Colors.blue, BlendMode.srcIn),
+                        ),
                       ),
                       //const Divider(height: 1),
                       ListTile(
@@ -160,7 +172,13 @@ class _HomeScreenState extends State<HomeShell> {
                             ),
                           ],
                         ),
-                        trailing: const Icon(Icons.send),
+                        trailing: SvgPicture.asset(
+                          'assets/icons/caret-right.svg',
+                          width: 24,
+                          height: 24,
+                          colorFilter:
+                              ColorFilter.mode(Colors.blue, BlendMode.srcIn),
+                        ),
                       ),
                     ],
                   ),
@@ -185,8 +203,11 @@ class _HomeScreenState extends State<HomeShell> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             if (widget.transactions == false)
-                              const Text('Make a transaction',style: TextStyle(
-                                  fontSize: 13, fontWeight: FontWeight(300)),),
+                              const Text(
+                                'Make a transaction',
+                                style: TextStyle(
+                                    fontSize: 13, fontWeight: FontWeight(300)),
+                              ),
                           ],
                         ),
                       ),
@@ -210,9 +231,14 @@ class _HomeScreenState extends State<HomeShell> {
                             Text('Paid directly into your account'),
                           ],
                         ),
-                        trailing: const Icon(Icons.send),
+                        trailing: SvgPicture.asset(
+                          'assets/icons/caret-right.svg',
+                          width: 24,
+                          height: 24,
+                          colorFilter:
+                              ColorFilter.mode(Colors.blue, BlendMode.srcIn),
+                        ),
                       ),
-
                       ListTile(
                         onTap: () {
                           context.go('/transfer');
@@ -225,7 +251,13 @@ class _HomeScreenState extends State<HomeShell> {
                             Text('Get more from your account'),
                           ],
                         ),
-                        trailing: const Icon(Icons.send),
+                        trailing: SvgPicture.asset(
+                          'assets/icons/caret-right.svg',
+                          width: 24,
+                          height: 24,
+                          colorFilter:
+                              ColorFilter.mode(Colors.blue, BlendMode.srcIn),
+                        ),
                       ),
                     ],
                   ),

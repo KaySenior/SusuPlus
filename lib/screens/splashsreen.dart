@@ -35,10 +35,13 @@ class SplashScreen extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Image.asset(
-                      'assets/images/atom.png',
-                      width: 30,
-                      height: 30,
+                    Hero(
+                      tag: 'appLogo',
+                      child: Image.asset(
+                        'assets/images/atom.png',
+                        width: 30,
+                        height: 30,
+                      ),
                     ),
                     const SizedBox(height: 12),
                     const Text(

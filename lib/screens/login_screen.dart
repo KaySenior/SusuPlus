@@ -86,7 +86,7 @@ class _Login2State extends State<Login2> {
                         style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.black,
                             foregroundColor: Colors.white),
-                        onPressed: () {},
+                        onPressed: () {context.go('/homepage');},
                         child: Text(
                           'Continue',
                           style: TextStyle(fontSize: 18),

@@ -33,7 +33,14 @@ class _LoadState extends State<Load> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: Center(
-        child: Lottie.asset('assets/loading.json'),
+        child: Hero(
+          tag: 'appLogo',
+          child: SizedBox(
+            width: 180,
+            height: 180,
+            child: Lottie.asset('assets/loading.json'),
+          ),
+        ),
       ),
     );
   }
