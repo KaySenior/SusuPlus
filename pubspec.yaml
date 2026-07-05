@@ -37,10 +37,10 @@ flutter:
     - assets/images/atom.png
     - assets/images/g_logo.png
     - assets/images/arrow-left.svg
-    - assets/images/x.svg
     - assets/404.json
     - assets/loading.json
-    - assets/images/exit.png
+    - assets/images/add_money.png
+    - assets/icons/
 
 flutter_native_splash:
   color: "#ffffff"

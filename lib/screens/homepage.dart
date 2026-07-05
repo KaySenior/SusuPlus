@@ -1,75 +1,239 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
+import 'package:susu/screens/account_screen.dart';
+import 'package:susu/screens/transaction_screen.dart';
+import 'package:susu/screens/transfer_screen.dart';
+import 'package:susu/widgets/navbar.dart';
+import '../core/notifier.dart';
+final List<Widget> pages = [
+    const HomeShell(),
+    const TransferScreen(),
+    const TransactionScreen(),
+    const AccountScreen(),
+  ];
 
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+class HomeTab extends StatelessWidget {
+  const HomeTab({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: Padding(
-          padding: const EdgeInsets.all(7.0),
-          child: CircleAvatar(
-            backgroundColor: Colors.grey,
-          ),
-        ),
-        title: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: SizedBox(
-            width: 325,
-            height: 45,
-            child: TextField(
-              decoration: InputDecoration(
-                  hintText: "Search",
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(50))),
-            ),
-          ),
-        ),
-        actions: [
-          CircleAvatar(),
-          SizedBox(
-            width: 5,
-          ),
-          CircleAvatar()
-        ],
-        backgroundColor: Colors.transparent,
+      body: ValueListenableBuilder<int>(
+        valueListenable: selectedPage,
+        builder: (context, index, child) {
+          return IndexedStack(index: index, children: pages);
+        },
       ),
-      bottomNavigationBar: NavigationBar(destinations: [
-        NavigationDestination(icon: Icon(Icons.home), label: "Home"),
-        NavigationDestination(icon: Icon(Icons.send), label: "Send"),
-        NavigationDestination(icon: Icon(Icons.savings), label: "Savings"),
-        NavigationDestination(icon: Icon(Icons.history), label: "History"),
-      ]),
-      body: Stack(
-        fit: StackFit.expand,
-        children: [
-          Image.asset(
-            'assets/images/final.jpg',
-            fit: BoxFit.fitWidth,
-            alignment: Alignment.topCenter,
-          ),
-          Positioned(
-              left: 0,
-              right: 0,
-              bottom: 50,
-              child: ListTile(
-                tileColor: Colors.black,
-              )),
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: Container(
-              padding: const EdgeInsets.only(
-                  top: 24, left: 20, right: 20, bottom: 20),
-              decoration: const BoxDecoration(
-                color: Colors.white,
-              ),
-              child: Column(),
+      bottomNavigationBar: const Navbar(),
+    );
+  }
+}
+
+class HomeShell extends StatefulWidget {
+  const HomeShell({super.key});
+
+  final bool transactions = false;
+  final double balance = 0.00;
+
+  @override
+  State<HomeShell> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeShell> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        leading: Builder(builder: (context) {
+          return IconButton(
+              onPressed: () {
+                Scaffold.of(context).openDrawer();
+              },
+              icon: SvgPicture.asset(
+                'assets/icons/list.svg',
+                width: 24,
+                height: 24,
+              ));
+        }),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: SvgPicture.asset(
+              'assets/icons/bell.svg',
+              width: 24,
+              height: 24,
             ),
           )
         ],
+      ),
+      drawer: Drawer(
+        child: ListView(
+          children: [
+            ListTile(
+              tileColor: Colors.grey,
+            )
+          ],
+        ),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          spacing: 24,
+          children: [
+            Column(
+              spacing: 12,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CircleAvatar(
+                      backgroundColor: Colors.transparent,
+                      child: Image.asset('assets/images/atom.png'),
+                    ),
+                    const SizedBox(width: 8),
+                    const Text('Total Balance'),
+                  ],
+                ),
+                Text(
+                  '\$${widget.balance}',
+                  style: const TextStyle(fontSize: 25),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+            Column(
+              spacing: 8,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Get Started',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+                Card.outlined(
+                  color: Colors.transparent,
+                  child: Column(
+                    children: [
+                      ListTile(
+                        leading: CircleAvatar(
+                          backgroundImage:
+                              AssetImage('assets/images/money_transfer.png'),
+                        ),
+                        title: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: const [
+                            Text(
+                              'Receive Money',
+                              style: TextStyle(fontWeight: FontWeight(500)),
+                            ),
+                            Text(
+                              'Paid directly into your account',
+                              style: TextStyle(
+                                  fontSize: 13, fontWeight: FontWeight(300)),
+                            ),
+                          ],
+                        ),
+                        trailing: const Icon(Icons.send),
+                      ),
+                      //const Divider(height: 1),
+                      ListTile(
+                        onTap: () {
+                          context.go('/transfer');
+                        },
+                        leading: CircleAvatar(
+                          backgroundImage:
+                              AssetImage('assets/images/add_money.png'),
+                        ),
+                        title: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: const [
+                            Text(
+                              'Add Money',
+                              style: TextStyle(fontWeight: FontWeight(500)),
+                            ),
+                            Text(
+                              'Get more from your account',
+                              style: TextStyle(
+                                  fontSize: 13, fontWeight: FontWeight(300)),
+                            ),
+                          ],
+                        ),
+                        trailing: const Icon(Icons.send),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            Column(
+              spacing: 8,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Recently paid',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+                Card.outlined(
+                  color: Colors.transparent,
+                  child: Column(
+                    children: [
+                      ListTile(
+                        leading: const Icon(Icons.money),
+                        title: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            if (widget.transactions == false)
+                              const Text('Make a transaction',style: TextStyle(
+                                  fontSize: 13, fontWeight: FontWeight(300)),),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Text(
+                  'Transactions',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                ),
+                Card.outlined(
+                  color: Colors.transparent,
+                  child: Column(
+                    children: [
+                      ListTile(
+                        leading: const Icon(Icons.money),
+                        title: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: const [
+                            Text('Receive Money'),
+                            Text('Paid directly into your account'),
+                          ],
+                        ),
+                        trailing: const Icon(Icons.send),
+                      ),
+
+                      ListTile(
+                        onTap: () {
+                          context.go('/transfer');
+                        },
+                        leading: const Icon(Icons.money),
+                        title: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: const [
+                            Text('Add Money'),
+                            Text('Get more from your account'),
+                          ],
+                        ),
+                        trailing: const Icon(Icons.send),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

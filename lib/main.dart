@@ -14,9 +14,7 @@ void main() async {
   );
 
   runApp(const MyApp()
-      // LoginScreen()
-
-      );
+);
 }
 
 class MyApp extends StatelessWidget {
@@ -29,7 +27,7 @@ class MyApp extends StatelessWidget {
       routerConfig: appRouter,
       theme: ThemeData(
           useMaterial3: true,
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.tealAccent)),
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueAccent)),
     );
   }
 }

@@ -22,7 +22,7 @@ class SplashScreen extends StatelessWidget {
             right: 0,
             child: Container(
               padding: const EdgeInsets.only(
-                  top: 24, left: 20, right: 20, bottom: 20),
+                  top: 24, left: 20, right: 20, bottom: 25),
               decoration: const BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.vertical(
@@ -66,7 +66,8 @@ class SplashScreen extends StatelessWidget {
                             context.go('/login');
                           },
                           height: 50, //
-                          borderRadius: const BorderRadius.all(Radius.circular(15)),
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(15)),
                           text: 'Continue with Apple',
                         ),
                         const SizedBox(height: 12),
@@ -81,7 +82,8 @@ class SplashScreen extends StatelessWidget {
                             side: const BorderSide(color: Color(0xFFDADCE0)),
                             elevation: 0,
                             shape: const RoundedRectangleBorder(
-                              borderRadius: BorderRadius.all(Radius.circular(15)),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(15)),
                             ),
                           ),
                           child: Row(
@@ -112,7 +114,8 @@ class SplashScreen extends StatelessWidget {
                               child: ElevatedButton(
                                   style: ElevatedButton.styleFrom(
                                     shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(15)),
+                                        borderRadius:
+                                            BorderRadius.circular(15)),
                                     backgroundColor: Color(0xFFCBCBCB),
                                     foregroundColor: Colors.black,
                                   ),
@@ -124,26 +127,24 @@ class SplashScreen extends StatelessWidget {
                                     style: TextStyle(fontSize: 19),
                                   ))),
                         ),
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    Row(
-                      children: [
-                        Text(
-                          "By continuing you agree to Susu's",
-                          style: TextStyle(fontWeight: FontWeight(250)),
+                        Row(
+                          children: [
+                            const SizedBox(width: 25,),
+                            Text(
+                              "By continuing you agree to Susu's",
+                              style: TextStyle(fontWeight: FontWeight(250)),
+                            ),
+                            Text("Terms of Use",
+                                style: TextStyle(fontWeight: FontWeight(500)))
+                          ],
                         ),
-                        Text("Terms of Use",
-                            style: TextStyle(fontWeight: FontWeight(500)))
                       ],
                     ),
                   ],
                 ),
               ),
             ),
-          )
+          ),
         ],
       ),
     );

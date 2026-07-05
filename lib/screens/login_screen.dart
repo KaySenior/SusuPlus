@@ -1,241 +1,112 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:susu/services/auth_service.dart';
-
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
-final authService = AuthService();
-
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class Login2 extends StatefulWidget {
+  const Login2({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<Login2> createState() => _Login2State();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
-  TextEditingController controllerEmail = TextEditingController();
-  TextEditingController controllerPassword = TextEditingController();
-
-  @override
-  void dispose() {
-    controllerEmail.dispose();
-    controllerPassword.dispose();
-    super.dispose();
-  }
-
-  void register() async {
-    final email = controllerEmail.text.trim();
-    final password = controllerPassword.text.trim();
-
-    if (email.isEmpty || password.length < 6) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Enter a valid email and a password of at least 6 characters',
-          ),
-        ),
-      );
-      return;
-    }
-
-    try {
-      await authService.createAccount(email: email, password: password);
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Registration successful')));
-      Navigator.pop(context);
-    } on FirebaseAuthException catch (e) {
-      print('CODE: ${e.code}');
-      print('MESSAGE: ${e.message}');
-      print('FULL: $e');
-    } catch (e) {
-      print('NON-FIREBASE ERROR: $e');
-    }
-  }
-
+class _Login2State extends State<Login2> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: false,
-      //!Also added the resized to prevent the screen from building space for the keyboard which
-      //!makes the whole screen raise when you are using keyboardType property in textField
+      backgroundColor: Colors.grey,
       appBar: AppBar(
-        automaticallyImplyLeading: false,
-        // title: const Text("Login"),
-        // centerTitle: true,
         backgroundColor: Colors.grey,
       ),
-      // backgroundColor: Colors.blueAccent,
       body: Container(
-        height: 800,
-        color: Colors.grey,
+        width: double.infinity,
+        height: double.infinity,
+        decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+        padding: EdgeInsets.all(10),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.end,
-          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Container(
-              width: double.infinity,
-              height: 625,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(25),
-                  topRight: Radius.circular(25),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(
+                  decoration: BoxDecoration(boxShadow: [
+                    BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.1),
+                        blurRadius: 5,
+                        spreadRadius: 2,
+                        offset: Offset(0, 4))
+                  ]),
+                  child: CircleAvatar(
+                    backgroundColor: Colors.grey,
+                    child: SvgPicture.asset('assets/images/arrow-left.svg'),
+                  ),
                 ),
-                color: Colors.white,
-              ),
-              child: Stack(
-                children: [
-                  // Text("Email"),
-
-                  Positioned(
-                    left: 8,
-                    right: 8,
-                    top: 125,
-                    child: TextField(
-                      controller: controllerEmail,
-                      keyboardType: TextInputType.emailAddress,
-                      decoration: InputDecoration(
-                        labelText: 'Email',
-                        hintText: 'user@example.com',
-                        border: OutlineInputBorder(
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(20))),
-                      ),
-                      onEditingComplete: () {
-                        setState(() {});
-                      },
-                    ),
-                  ),
-
-                  ///
-                  ///
-
-                  //!I have commented this out because I am using the labelText propery in the email
-                  Positioned(
-                    left: 8,
-                    right: 8,
-                    top: 195,
-                    child: TextField(
-                      controller: controllerPassword,
-                      keyboardType: TextInputType.text,
-                      obscureText: true,
-                      decoration: InputDecoration(
-                          labelText: 'Password',
-                          hintText: 'Password123',
-                          border: OutlineInputBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(20)))),
-                    ),
-                  ),
-
-                  ///
-                  ///Continue Button
-                  ///
-                  Positioned(
-                    left: 8,
-                    right: 8,
-                    top: 265,
-                    child: SizedBox(
-                        width: 300,
-                        height: 50,
-                        child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.black),
-                            onPressed: () {
-                              //  register();
-                              context.go('/homepage');
-                            },
-                            child: Text("Continue",
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                )))),
-                  ),
-                  Positioned(
-                    left: 8,
-                    right: 8,
-                    bottom: 270,
-                    child: Center(
-                      child: Text('Forgot password?',
-                          style: TextStyle(
-                            color: Colors.black,
-                            decoration: TextDecoration.underline,
-                            textBaseline: TextBaseline.ideographic,
-                            fontWeight: FontWeight.bold,
-                          )),
-                    ),
-                  )
-
-                  ///
-                  ///logo
-                  ///
-                  ,
-                  Positioned(
-                    top: 30,
-                    left: 8,
-                    right: 8,
-                    child: Center(
-                      child: Container(
-                        height: 50,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(100),
-                          ),
-                        ),
-                        child: Image.asset(
-                          'assets/images/atom.png',
-                          fit: BoxFit.fill,
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  ///
-                  ///Enter Your Password
-                  ///
-
-                  Positioned(
-                    top: 83,
-                    left: 8,
-                    right: 8,
-                    child: Center(
-                      child: Text('Enter your password',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18,
-                          )),
-                    ),
-                  ),
-
-                  ///
-                  ///left logo
-                  ///
-                  Positioned(
-                    top: 14,
-                    left: 3,
-                    // right: 8,
-                    child: TextButton(
-                      onPressed: () {
-                        context.go('/home');
-                      },
-                      child: Container(
-                        height: 30,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(100),
-                          ),
-                        ),
-                        child: Image.asset('assets/images/exit.png',
-                            fit: BoxFit.fill),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+                CircleAvatar(
+                  backgroundColor: Colors.grey,
+                  child: SvgPicture.asset('assets/images/x.svg'),
+                )
+              ],
             ),
+            CircleAvatar(backgroundColor: Colors.transparent, child: Image.asset('assets/images/atom.png')),
+            Text(
+              'Enter your password',
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight(500)),
+            ),
+            Column(
+              //crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                TextField(
+                  decoration: InputDecoration(
+                      labelText: 'Email',
+                      floatingLabelBehavior: FloatingLabelBehavior.always,
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(15))),
+                ),
+                const SizedBox(
+                  height: 15,
+                ),
+                TextField(
+                  decoration: InputDecoration(
+                      labelText: 'Password',
+                      floatingLabelBehavior: FloatingLabelBehavior.always,
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(15))),
+                ),
+                const SizedBox(
+                  height: 15,
+                ),
+                SizedBox(
+                    width: 400,
+                    height: 50,
+                    child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.black,
+                            foregroundColor: Colors.white),
+                        onPressed: () {},
+                        child: Text(
+                          'Continue',
+                          style: TextStyle(fontSize: 18),
+                        ))),
+                TextButton(
+                    onPressed: () {
+                      context.go('/home');
+                    },
+                    child: Text(
+                      'Forgot password?',
+                      style: TextStyle(
+                          decoration: TextDecoration.underline,
+                          color: Colors.black,
+                          fontSize: 18,
+                          fontWeight: FontWeight(
+                            500,
+                          )),
+                    ))
+              ],
+            )
           ],
         ),
       ),

@@ -1,2 +1,2 @@
-
-//ValueNotifier<int> isTapped = ValueNotifier();
+import 'package:flutter/material.dart';
+ValueNotifier<int> selectedPage = ValueNotifier(0);
