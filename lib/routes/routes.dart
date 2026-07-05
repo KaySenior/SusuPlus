@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:susu/screens/profile_screen.dart';
 import 'package:susu/screens/transfer_screen.dart';
 import '../screens/signup_screen.dart';
 import '../screens/login_screen.dart';
@@ -7,7 +8,6 @@ import '../screens/homepage.dart';
 import '../screens/settings.dart';
 import '../screens/loading_screen.dart';
 import '../screens/splashsreen.dart';
-import '../screens/transfer_screen.dart';
 
 class AppRoutes {
   AppRoutes._();

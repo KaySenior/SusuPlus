@@ -41,6 +41,15 @@ flutter:
     - assets/404.json
     - assets/loading.json
     - assets/images/exit.png
+    - assets/images/profileImage.jpg
+    - assets/icons/arrowforprofile.png
+    - assets/icons/user-circle.png
+    - assets/icons/shield.png
+    - assets/icons/money.png
+    - assets/icons/taxes.png
+    - assets/icons/cash.png
+    - assets/icons/settings.png
+    - assets/icons/accessibility.png
 
 flutter_native_splash:
   color: "#ffffff"
