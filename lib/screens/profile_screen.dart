@@ -169,12 +169,13 @@ class Screen {
                             'Personal information',
                             style: TextStyle(
                               fontSize: 18,
-                              fontWeight: FontWeight(480),
+                              fontWeight: FontWeight(280),
                             ),
                           ),
                           trailing: IconButton(
-                              onPressed: () {},
-                              icon: Icon(Icons.arrow_forward_ios)),
+                            onPressed: () {},
+                            icon: Icon(Icons.arrow_forward_ios),
+                          ),
                         ),
                       ),
                       Expanded(
@@ -188,7 +189,7 @@ class Screen {
                             'Payment and payouts',
                             style: TextStyle(
                               fontSize: 18,
-                              fontWeight: FontWeight(480),
+                              fontWeight: FontWeight(280),
                             ),
                           ),
                           trailing: IconButton(
@@ -208,7 +209,7 @@ class Screen {
                             'Taxes ',
                             style: TextStyle(
                               fontSize: 18,
-                              fontWeight: FontWeight(480),
+                              fontWeight: FontWeight(280),
                             ),
                           ),
                           trailing: IconButton(
@@ -227,7 +228,7 @@ class Screen {
                             'Logic & security',
                             style: TextStyle(
                               fontSize: 18,
-                              fontWeight: FontWeight(480),
+                              fontWeight: FontWeight(280),
                             ),
                           ),
                           trailing: IconButton(
@@ -246,7 +247,7 @@ class Screen {
                             'Accessibility',
                             style: TextStyle(
                               fontSize: 18,
-                              fontWeight: FontWeight(480),
+                              fontWeight: FontWeight(280),
                             ),
                           ),
                           trailing: IconButton(
