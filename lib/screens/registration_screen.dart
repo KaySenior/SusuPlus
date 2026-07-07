@@ -228,7 +228,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             Radius.circular(100),
                           ),
                         ),
-                        child: Image.asset('assets/images/exit.png',
+                        child: Image.asset('assets/images/atom.png',
                             fit: BoxFit.fill),
                       ),
                     ),

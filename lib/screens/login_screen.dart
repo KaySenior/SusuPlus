@@ -93,7 +93,7 @@ class _Login2State extends State<Login2> {
                         ))),
                 TextButton(
                     onPressed: () {
-                      context.go('/home');
+                      context.go('/');
                     },
                     child: Text(
                       'Forgot password?',

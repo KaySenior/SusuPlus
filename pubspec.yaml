@@ -49,6 +49,7 @@ flutter:
     - assets/icons/accessibility.png
     - assets/icons/caret-right.svg
     - assets/images/add_money.png
+    - assets/icons/house.svg
 
 flutter_native_splash:
   color: "#ffffff"
