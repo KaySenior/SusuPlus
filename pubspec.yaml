@@ -50,7 +50,12 @@ flutter:
     - assets/icons/caret-right.svg
     - assets/images/add_money.png
     - assets/icons/house.svg
-
+    - assets/icons/list.svg
+    - assets/icons/bell.svg
+    - assets/icons/scroll.svg
+    - assets/icons/user.svg
+    - assets/images/money_transfer.png
+    - assets/icons/plus.svg
 flutter_native_splash:
   color: "#ffffff"
   image: assets/images/final.jpg
