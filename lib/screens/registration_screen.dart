@@ -23,33 +23,54 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  void register() async {
+  void login() async {
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
 
-    if (email.isEmpty || password.length < 6) {
+    if (email.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Enter a valid email and a password of at least 6 characters'),
-        ),
+        const SnackBar(content: Text('Please enter your email and password.')),
       );
       return;
     }
 
     try {
-      await authService.createAccount(email: email, password: password);
+      await authService.signIn(email: email, password: password);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Registration successful')),
-        );
-        Navigator.pop(context);
+        context.go('/homepage');
       }
     } on FirebaseAuthException catch (e) {
-      print('CODE: ${e.code}');
-      print('MESSAGE: ${e.message}');
-      print('FULL: $e');
+      if (mounted) {
+        String message;
+        switch (e.code) {
+          case 'user-not-found':
+            message = 'No account found with this email.';
+            break;
+          case 'wrong-password':
+            message = 'Incorrect password. Please try again.';
+            break;
+          case 'invalid-email':
+            message = 'Please enter a valid email address.';
+            break;
+          case 'invalid-credential':
+            message = 'Invalid email or password.';
+            break;
+          case 'too-many-requests':
+            message = 'Too many attempts. Please try again later.';
+            break;
+          default:
+            message = e.message ?? 'Login failed. Please try again.';
+        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(message)),
+        );
+      }
     } catch (e) {
-      print('NON-FIREBASE ERROR: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Something went wrong. Please try again.')),
+        );
+      }
     }
   }
 
@@ -123,13 +144,13 @@ class _LoginScreenState extends State<LoginScreen> {
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   elevation: 0,
                 ),
-                onPressed: () => context.go('/homepage'),
+                onPressed: login,
                 child: const Text('Continue', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
               ),
             ),
             const SizedBox(height: 16),
             TextButton(
-              onPressed: () {},
+              onPressed: () => context.go('/forgot-password'),
               child: const Text(
                 'Forgot password?',
                 style: TextStyle(

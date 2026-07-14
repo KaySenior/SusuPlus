@@ -1,6 +1,7 @@
 import 'package:go_router/go_router.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:susu/services/auth_service.dart';
 
 class SplashScreen extends StatelessWidget {
@@ -21,6 +22,7 @@ class SplashScreen extends StatelessWidget {
     }
   }
 
+  //!Apple requires a developer subscription to enable apple sign in so this wont work
   Future<void> _signInWithApple(BuildContext context) async {
     try {
       final user = await AuthService.signInWithApple();
@@ -150,16 +152,27 @@ class SplashScreen extends StatelessWidget {
                                   onPressed: () {
                                     context.go('/login');
                                   },
-                                  child: const Text(
-                                    "Continue with Email",
-                                    style: TextStyle(fontSize: 19),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      SvgPicture.asset(
+                                        'assets/icons/envelope.svg',
+                                        height: 20,
+                                        width: 20,
+                                      ),
+                                      const SizedBox(width: 12),
+                                      const Text(
+                                        "Continue with Email",
+                                        style: TextStyle(fontSize: 19),
+                                      ),
+                                    ],
                                   ))),
                         ),
                         Row(
                           children: [
                             const SizedBox(width: 25,),
                             Text(
-                              "By continuing you agree to Susu's",
+                              "By continuing you agree to Susu's ",
                               style: TextStyle(fontWeight: FontWeight(250)),
                             ),
                             Text("Terms of Use",

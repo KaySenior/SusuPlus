@@ -9,6 +9,7 @@ import '../screens/settings.dart';
 import '../screens/loading_screen.dart';
 import '../screens/splashsreen.dart';
 import '../screens/profile_screen.dart';
+import '../screens/forgot_password_screen.dart';
 
 class AppRoutes {
   AppRoutes._();
@@ -21,6 +22,7 @@ class AppRoutes {
   static const String loading = '/loading';
   static const String transfer = '/transfer';
   static const String profile = '/profile';
+  static const String forgotPassword = '/forgot-password';
 }
 
 final GoRouter appRouter = GoRouter(
@@ -50,6 +52,10 @@ final GoRouter appRouter = GoRouter(
         path: AppRoutes.transfer,
         builder: (BuildContext context, GoRouterState state) =>
             TransferScreen()),
-    GoRoute(path: AppRoutes.profile, builder: (BuildContext context, GoRouterState state)=> ProfileScreen())
+    GoRoute(path: AppRoutes.profile, builder: (BuildContext context, GoRouterState state)=> ProfileScreen()),
+    GoRoute(
+        path: AppRoutes.forgotPassword,
+        builder: (BuildContext context, GoRouterState state) =>
+            const ForgotPasswordScreen()),
   ],
 );

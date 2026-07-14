@@ -36,8 +36,6 @@ class HomeTab extends StatelessWidget {
 class HomeShell extends StatefulWidget {
   const HomeShell({super.key});
 
-  final double balance = 0.00;
-
   @override
   State<HomeShell> createState() => _HomeScreenState();
 }
@@ -83,7 +81,7 @@ class _HomeScreenState extends State<HomeShell> {
                   ],
                 ),
                 Text(
-                  '\$${widget.balance}',
+                  '\$${context.watch<TransactionsProvider>().balance.toStringAsFixed(2)}',
                   style: const TextStyle(fontSize: 25),
                   textAlign: TextAlign.center,
                 ),
@@ -237,7 +235,7 @@ class _HomeScreenState extends State<HomeShell> {
                                   borderRadius: BorderRadiusGeometry.circular(5)
                                 )
                               ),
-                              onPressed: () {},
+                              onPressed: () => context.go('/transfer'),
                               child: const Text(
                                 'Make a transaction',
                                 style: TextStyle(fontSize: 18),

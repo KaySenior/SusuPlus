@@ -24,6 +24,8 @@ dependencies:
   mockito: ^5.6.4
   google_fonts: ^8.1.0
   provider: ^6.1.2
+  http: ^1.6.0
+  url_launcher: ^6.3.2
 
 dev_dependencies:
   flutter_test:
@@ -61,6 +63,7 @@ flutter:
     - assets/icons/receipt.svg
     - assets/icons/money-wavy.svg
     - assets/icons/wallet.svg
+    - assets/icons/envelope.svg
 flutter_native_splash:
   color: "#ffffff"
   image: assets/images/final.jpg

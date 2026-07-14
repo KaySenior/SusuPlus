@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import 'package:susu/provider/provider.dart';
+import 'package:susu/models/transaction.dart';
+import 'package:susu/services/momo_service.dart';
 import 'package:susu/widgets/custom_row.dart';
 
 class TransferScreen extends StatefulWidget {
@@ -34,47 +39,72 @@ class _TransferScreenState extends State<TransferScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: _appBar(),
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.chevron_left, color: Colors.black87, size: 32),
+          onPressed: () => context.pop(),
+        ),
+        title: const Text(
+          'Transfer',
+          style: TextStyle(fontSize: 18, color: Colors.black87, fontWeight: FontWeight.w500),
+        ),
+        centerTitle: true,
+      ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const SizedBox(height: 24),
-            _amountField(),
-            const SizedBox(height: 24),
-            _recurringRow(),
             const Divider(height: 1),
-            _fromRow(),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const SizedBox(height: 24),
+                  _amountField(),
+                  const SizedBox(height: 24),
+                ],
+              ),
+            ),
             const Divider(height: 1),
-            _toRow(),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: _recurringRow(),
+            ),
             const Divider(height: 1),
-            _dateRow(),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: _fromRow(),
+            ),
             const Divider(height: 1),
-            const SizedBox(height: 24),
-            _disclaimer(),
-            const SizedBox(height: 40),
-            _continueButton(),
-            const SizedBox(height: 24),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: _toRow(),
+            ),
+            const Divider(height: 1),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: _dateRow(),
+            ),
+            const Divider(height: 1),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const SizedBox(height: 24),
+                  _disclaimer(),
+                  const SizedBox(height: 40),
+                  _continueButton(),
+                  const SizedBox(height: 24),
+                ],
+              ),
+            ),
           ],
         ),
       ),
-    );
-  }
-
-  PreferredSizeWidget _appBar() {
-    return AppBar(
-      backgroundColor: Colors.white,
-      elevation: 0,
-      leading: IconButton(
-        icon: const Icon(Icons.chevron_left, color: Colors.black87, size: 32),
-        onPressed: () {},
-      ),
-      title: const Text(
-        'Transfer',
-        style: TextStyle(fontSize: 18, color: Colors.black87, fontWeight: FontWeight.w500),
-      ),
-      centerTitle: true,
     );
   }
 
@@ -121,16 +151,8 @@ class _TransferScreenState extends State<TransferScreen> {
   }
 
   Widget _fromRow() {
-    return const CustomDropdownRow(
-      label: 'From',
-      value: 'Your account',
-      boxLabel: '••••',
-    );
-  }
-
-  Widget _toRow() {
     return CustomRow(
-      label: 'To',
+      label: 'From number',
       trailing: SizedBox(
         width: 200,
         height: 30,
@@ -144,6 +166,14 @@ class _TransferScreenState extends State<TransferScreen> {
           style: const TextStyle(fontSize: 14),
         ),
       ),
+    );
+  }
+
+  Widget _toRow() {
+    return const CustomDropdownRow(
+      label: 'To',
+      value: 'Your account',
+      boxLabel: '••••',
     );
   }
 
@@ -189,7 +219,44 @@ class _TransferScreenState extends State<TransferScreen> {
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
           elevation: 0,
         ),
-        onPressed: () {},
+        onPressed: () async {
+          final amount = double.tryParse(_amountController.text) ?? 0;
+          if (amount <= 0) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Please enter a valid amount.')),
+            );
+            return;
+          }
+          final email = 'customer@email.com';
+          final reference = DateTime.now().millisecondsSinceEpoch.toString();
+          final success = await MomoService.makePayment(
+            email: email,
+            amount: (amount * 100).toInt(),
+            reference: reference,
+          );
+          if (success) {
+            context.read<TransactionsProvider>().addTransaction(
+              Transaction(
+                id: reference,
+                title: 'Money added',
+                amount: amount,
+                date: DateTime.now(),
+              ),
+            );
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Payment successful!')),
+              );
+            }
+            context.pop();
+          } else {
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Payment failed. Please try again.')),
+              );
+            }
+          }
+        },
         child: const Text(
           'Continue',
           style: TextStyle(fontSize: 17, color: Colors.white),

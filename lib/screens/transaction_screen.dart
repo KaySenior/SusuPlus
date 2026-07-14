@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class TransactionScreen extends StatefulWidget {
   const TransactionScreen({super.key});
@@ -52,7 +53,7 @@ class _TransactionScreenState extends State<TransactionScreen> {
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
                           elevation: 0,
                         ),
-                        onPressed: () {},
+                        onPressed: () => context.go('/transfer'),
                         child: const Text(
                           'Make a transaction',
                           style: TextStyle(fontSize: 16, color: Colors.white),
