@@ -1,13 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-
-//!I'm using the better comments code extension for highlighted comments so download it 
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 class AuthService {
   static final FirebaseAuth _auth = FirebaseAuth.instance;
   static final GoogleSignIn _googleSignIn = GoogleSignIn();
 
-  //! Create a user with email 
   final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
 
   User? get currentUser => firebaseAuth.currentUser;
@@ -34,30 +32,23 @@ class AuthService {
     );
   }
 
-
-  //! Sign in with Google
   static Future<User?> signInWithGoogle() async {
     try {
-
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
 
       if (googleUser == null) {
-
         print('Google Sign-In cancelled by user');
         return null;
       }
 
-      //! Get the authentication details from Google
       final GoogleSignInAuthentication googleAuth =
           await googleUser.authentication;
 
-      //! Create a new credential
       final credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
 
-      //! Sign in to Firebase with the Google credentials
       final UserCredential userCredential =
           await _auth.signInWithCredential(credential);
 
@@ -72,7 +63,34 @@ class AuthService {
     }
   }
 
-  //! Sign out
+  static Future<User?> signInWithApple() async {
+    try {
+      final appleCredential = await SignInWithApple.getAppleIDCredential(
+        scopes: [
+          AppleIDAuthorizationScopes.email,
+          AppleIDAuthorizationScopes.fullName,
+        ],
+      );
+
+      final credential = OAuthProvider('apple.com').credential(
+        idToken: appleCredential.identityToken,
+        accessToken: appleCredential.authorizationCode,
+      );
+
+      final UserCredential userCredential =
+          await _auth.signInWithCredential(credential);
+
+      print('Successfully signed in with Apple: ${userCredential.user?.email}');
+      return userCredential.user;
+    } on FirebaseAuthException catch (e) {
+      print('Firebase Auth Error: ${e.code} - ${e.message}');
+      rethrow;
+    } catch (e) {
+      print('Error during Apple Sign-In: $e');
+      rethrow;
+    }
+  }
+
   static Future<void> signOut() async {
     try {
       await _auth.signOut();
@@ -84,16 +102,11 @@ class AuthService {
     }
   }
 
-  //! Get current user
   static User? getCurrentUser() {
     return _auth.currentUser;
   }
 
-  //! Check if user is logged in
   static bool isUserLoggedIn() {
     return _auth.currentUser != null;
   }
-
-  //! Get user stream for state management
- // static Stream<User?> get authStateChanges => _auth.authStateChanges();
-} 
+}

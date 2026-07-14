@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:susu/services/auth_service.dart';
-
 import 'package:go_router/go_router.dart';
 
 final authService = AuthService();
@@ -14,26 +13,24 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  TextEditingController controllerEmail = TextEditingController();
-  TextEditingController controllerPassword = TextEditingController();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
 
   @override
   void dispose() {
-    controllerEmail.dispose();
-    controllerPassword.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
     super.dispose();
   }
 
   void register() async {
-    final email = controllerEmail.text.trim();
-    final password = controllerPassword.text.trim();
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
 
     if (email.isEmpty || password.length < 6) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Enter a valid email and a password of at least 6 characters',
-          ),
+        const SnackBar(
+          content: Text('Enter a valid email and a password of at least 6 characters'),
         ),
       );
       return;
@@ -41,10 +38,12 @@ class _LoginScreenState extends State<LoginScreen> {
 
     try {
       await authService.createAccount(email: email, password: password);
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Registration successful')));
-      Navigator.pop(context);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Registration successful')),
+        );
+        Navigator.pop(context);
+      }
     } on FirebaseAuthException catch (e) {
       print('CODE: ${e.code}');
       print('MESSAGE: ${e.message}');
@@ -57,183 +56,87 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: false,
-      //!Also added the resized to prevent the screen from building space for the keyboard which
-      //!makes the whole screen raise when you are using keyboardType property in textField
+      backgroundColor: Colors.white,
       appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
         automaticallyImplyLeading: false,
-        // title: const Text("Login"),
-        // centerTitle: true,
-        backgroundColor: Colors.grey,
+        leading: IconButton(
+          onPressed: () => context.go('/'),
+          icon: const Icon(Icons.arrow_back, color: Colors.black87),
+        ),
+
       ),
-      // backgroundColor: Colors.blueAccent,
-      body: Container(
-        height: 800,
-        color: Colors.grey,
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 24),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.end,
-          mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
-              width: double.infinity,
-              height: 625,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(25),
-                  topRight: Radius.circular(25),
+            const SizedBox(height: 32),
+            Image.asset('assets/images/atom.png', height: 72),
+            const SizedBox(height: 24),
+            const Text(
+              'Enter your password',
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600, color: Colors.black87),
+            ),
+            const SizedBox(height: 32),
+            TextField(
+              controller: _emailController,
+              keyboardType: TextInputType.emailAddress,
+              decoration: InputDecoration(
+                labelText: 'Email',
+                hintText: 'user@example.com',
+                labelStyle: const TextStyle(color: Colors.grey),
+                hintStyle: TextStyle(color: Colors.grey.shade400),
+                floatingLabelBehavior: FloatingLabelBehavior.always,
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: Color(0xFF1E6FD9), width: 2),
                 ),
-                color: Colors.white,
               ),
-              child: Stack(
-                children: [
-                  // Text("Email"),
-
-                  Positioned(
-                    left: 8,
-                    right: 8,
-                    top: 125,
-                    child: TextField(
-                      controller: controllerEmail,
-                      keyboardType: TextInputType.emailAddress,
-                      decoration: InputDecoration(
-                        labelText: 'Email',
-                        hintText: 'user@example.com',
-                        border: OutlineInputBorder(
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(20))),
-                      ),
-                      onEditingComplete: () {
-                        setState(() {});
-                      },
-                    ),
-                  ),
-
-                  ///
-                  ///
-
-                  //!I have commented this out because I am using the labelText propery in the email
-                  Positioned(
-                    left: 8,
-                    right: 8,
-                    top: 195,
-                    child: TextField(
-                      controller: controllerPassword,
-                      keyboardType: TextInputType.text,
-                      obscureText: true,
-                      decoration: InputDecoration(
-                          labelText: 'Password',
-                          hintText: 'Password123',
-                          border: OutlineInputBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(20)))),
-                    ),
-                  ),
-
-                  ///
-                  ///Continue Button
-                  ///
-                  Positioned(
-                    left: 8,
-                    right: 8,
-                    top: 265,
-                    child: SizedBox(
-                        width: 300,
-                        height: 50,
-                        child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.black),
-                            onPressed: () {
-                              //  register();
-                              context.go('/homepage');
-                            },
-                            child: Text("Continue",
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                )))),
-                  ),
-                  Positioned(
-                    left: 8,
-                    right: 8,
-                    bottom: 270,
-                    child: Center(
-                      child: Text('Forgot password?',
-                          style: TextStyle(
-                            color: Colors.black,
-                            decoration: TextDecoration.underline,
-                            textBaseline: TextBaseline.ideographic,
-                            fontWeight: FontWeight.bold,
-                          )),
-                    ),
-                  )
-
-                  ///
-                  ///logo
-                  ///
-                  ,
-                  Positioned(
-                    top: 30,
-                    left: 8,
-                    right: 8,
-                    child: Center(
-                      child: Container(
-                        height: 50,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(100),
-                          ),
-                        ),
-                        child: Image.asset(
-                          'assets/images/atom.png',
-                          fit: BoxFit.fill,
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  ///
-                  ///Enter Your Password
-                  ///
-
-                  Positioned(
-                    top: 83,
-                    left: 8,
-                    right: 8,
-                    child: Center(
-                      child: Text('Enter your password',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18,
-                          )),
-                    ),
-                  ),
-
-                  ///
-                  ///left logo
-                  ///
-                  Positioned(
-                    top: 14,
-                    left: 3,
-                    // right: 8,
-                    child: TextButton(
-                      onPressed: () {
-                        context.go('/home');
-                      },
-                      child: Container(
-                        height: 30,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(100),
-                          ),
-                        ),
-                        child: Image.asset('assets/images/atom.png',
-                            fit: BoxFit.fill),
-                      ),
-                    ),
-                  ),
-                ],
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: _passwordController,
+              obscureText: true,
+              decoration: InputDecoration(
+                labelText: 'Password',
+                hintText: 'Password123',
+                labelStyle: const TextStyle(color: Colors.grey),
+                hintStyle: TextStyle(color: Colors.grey.shade400),
+                floatingLabelBehavior: FloatingLabelBehavior.always,
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: Color(0xFF1E6FD9), width: 2),
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF1E6FD9),
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  elevation: 0,
+                ),
+                onPressed: () => context.go('/homepage'),
+                child: const Text('Continue', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextButton(
+              onPressed: () {},
+              child: const Text(
+                'Forgot password?',
+                style: TextStyle(
+                  decoration: TextDecoration.underline,
+                  color: Colors.black54,
+                  fontSize: 15,
+                ),
               ),
             ),
           ],

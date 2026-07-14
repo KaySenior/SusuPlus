@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
 class Login2 extends StatefulWidget {
@@ -13,100 +12,86 @@ class _Login2State extends State<Login2> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey,
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.grey,
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          onPressed: () {},
+          icon: const Icon(Icons.arrow_back, color: Colors.black87),
+        ),
+        actions: [
+          IconButton(
+            onPressed: () {},
+            icon: const Icon(Icons.close, color: Colors.black87),
+          ),
+        ],
       ),
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-        padding: EdgeInsets.all(10),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 24),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Container(
-                  decoration: BoxDecoration(boxShadow: [
-                    BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.1),
-                        blurRadius: 5,
-                        spreadRadius: 2,
-                        offset: Offset(0, 4))
-                  ]),
-                  child: CircleAvatar(
-                    backgroundColor: Colors.grey,
-                    child: SvgPicture.asset('assets/images/arrow-left.svg'),
-                  ),
-                ),
-                CircleAvatar(
-                  backgroundColor: Colors.grey,
-                  child: SvgPicture.asset('assets/images/x.svg'),
-                )
-              ],
-            ),
-            CircleAvatar(backgroundColor: Colors.transparent, child: Image.asset('assets/images/atom.png')),
-            Text(
+            const SizedBox(height: 40),
+            Image.asset('assets/images/atom.png', height: 80),
+            const SizedBox(height: 32),
+            const Text(
               'Enter your password',
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight(500)),
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600, color: Colors.black87),
             ),
-            Column(
-              //crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.max,
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                TextField(
-                  decoration: InputDecoration(
-                      labelText: 'Email',
-                      floatingLabelBehavior: FloatingLabelBehavior.always,
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15))),
+            const SizedBox(height: 32),
+            TextField(
+              decoration: InputDecoration(
+                labelText: 'Email',
+                labelStyle: const TextStyle(color: Colors.grey),
+                floatingLabelBehavior: FloatingLabelBehavior.always,
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: Color(0xFF1E6FD9), width: 2),
                 ),
-                const SizedBox(
-                  height: 15,
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              obscureText: true,
+              decoration: InputDecoration(
+                labelText: 'Password',
+                labelStyle: const TextStyle(color: Colors.grey),
+                floatingLabelBehavior: FloatingLabelBehavior.always,
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: Color(0xFF1E6FD9), width: 2),
                 ),
-                TextField(
-                  decoration: InputDecoration(
-                      labelText: 'Password',
-                      floatingLabelBehavior: FloatingLabelBehavior.always,
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15))),
+              ),
+            ),
+            const SizedBox(height: 24),
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF1E6FD9),
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  elevation: 0,
                 ),
-                const SizedBox(
-                  height: 15,
+                onPressed: () => context.go('/homepage'),
+                child: const Text('Continue', style: TextStyle(fontSize: 16)),
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextButton(
+              onPressed: () => context.go('/'),
+              child: const Text(
+                'Forgot password?',
+                style: TextStyle(
+                  decoration: TextDecoration.underline,
+                  color: Colors.black54,
+                  fontSize: 15,
                 ),
-                SizedBox(
-                    width: 400,
-                    height: 50,
-                    child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.black,
-                            foregroundColor: Colors.white),
-                        onPressed: () {context.go('/homepage');},
-                        child: Text(
-                          'Continue',
-                          style: TextStyle(fontSize: 18),
-                        ))),
-                TextButton(
-                    onPressed: () {
-                      context.go('/');
-                    },
-                    child: Text(
-                      'Forgot password?',
-                      style: TextStyle(
-                          decoration: TextDecoration.underline,
-                          color: Colors.black,
-                          fontSize: 18,
-                          fontWeight: FontWeight(
-                            500,
-                          )),
-                    ))
-              ],
-            )
+              ),
+            ),
           ],
         ),
       ),

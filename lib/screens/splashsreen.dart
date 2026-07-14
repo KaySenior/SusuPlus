@@ -1,9 +1,40 @@
 import 'package:go_router/go_router.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:flutter/material.dart';
+import 'package:susu/services/auth_service.dart';
 
 class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});
+
+  Future<void> _signInWithGoogle(BuildContext context) async {
+    try {
+      final user = await AuthService.signInWithGoogle();
+      if (user != null && context.mounted) {
+        context.go('/homepage');
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Google sign-in failed. Please try again.')),
+        );
+      }
+    }
+  }
+
+  Future<void> _signInWithApple(BuildContext context) async {
+    try {
+      final user = await AuthService.signInWithApple();
+      if (user != null && context.mounted) {
+        context.go('/homepage');
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Apple sign-in failed. Please try again.')),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,19 +96,15 @@ class SplashScreen extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         SignInWithAppleButton(
-                          onPressed: () {
-                            context.go('/login');
-                          },
-                          height: 50, //
+                          onPressed: () => _signInWithApple(context),
+                          height: 50,
                           borderRadius:
                               const BorderRadius.all(Radius.circular(15)),
                           text: 'Continue with Apple',
                         ),
                         const SizedBox(height: 12),
                         ElevatedButton(
-                          onPressed: () {
-                            context.go('/login');
-                          },
+                          onPressed: () => _signInWithGoogle(context),
                           style: ElevatedButton.styleFrom(
                             foregroundColor: Colors.black,
                             backgroundColor: Colors.white,
@@ -107,9 +134,7 @@ class SplashScreen extends StatelessWidget {
                             ],
                           ),
                         ),
-                        const SizedBox(
-                          height: 8,
-                        ),
+                        const SizedBox(height: 8),
                         SizedBox(
                           width: 400,
                           height: 50,
@@ -125,7 +150,7 @@ class SplashScreen extends StatelessWidget {
                                   onPressed: () {
                                     context.go('/login');
                                   },
-                                  child: Text(
+                                  child: const Text(
                                     "Continue with Email",
                                     style: TextStyle(fontSize: 19),
                                   ))),
