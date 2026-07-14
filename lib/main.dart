@@ -3,6 +3,9 @@ import 'package:susu/routes/routes.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:susu/provider/provider.dart';
+import 'package:provider/provider.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -11,7 +14,9 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  runApp(const MyApp());
+  runApp(ChangeNotifierProvider(
+      create: (_) => TransactionsProvider(),
+      child: const MyApp(),));
 }
 
 class MyApp extends StatelessWidget {

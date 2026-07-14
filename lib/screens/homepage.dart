@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:susu/screens/account_screen.dart';
+import 'package:provider/provider.dart';
+import 'package:susu/provider/provider.dart';
 import 'package:susu/screens/profile_screen.dart';
 import 'package:susu/screens/transaction_screen.dart';
 import 'package:susu/screens/transfer_screen.dart';
@@ -35,7 +36,6 @@ class HomeTab extends StatelessWidget {
 class HomeShell extends StatefulWidget {
   const HomeShell({super.key});
 
-  final bool transactions = false;
   final double balance = 0.00;
 
   @override
@@ -43,45 +43,24 @@ class HomeShell extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeShell> {
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        leading: Builder(builder: (context) {
-          return IconButton(
-              onPressed: () {
-                Scaffold.of(context).openDrawer();
-              },
-              icon: SvgPicture.asset(
-                'assets/icons/list.svg',
-                width: 24,
-                height: 24,
-                colorFilter:
-                              ColorFilter.mode(Colors.blue, BlendMode.srcIn),
-              ));
-        }),
+        backgroundColor: Colors.transparent,
+        leading: const SizedBox.shrink(),
         actions: [
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: SvgPicture.asset(
               'assets/icons/bell.svg',
-              colorFilter:
-                              ColorFilter.mode(Colors.blue, BlendMode.srcIn),
+              colorFilter: ColorFilter.mode(Colors.blue, BlendMode.srcIn),
               width: 24,
               height: 24,
             ),
           )
         ],
-      ),
-      drawer: Drawer(
-        child: ListView(
-          children: [
-            ListTile(
-              tileColor: Colors.grey,
-            )
-          ],
-        ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -119,13 +98,17 @@ class _HomeScreenState extends State<HomeShell> {
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 Card.outlined(
-                  color: Colors.transparent,
+                  color: Colors.white,
                   child: Column(
                     children: [
                       ListTile(
                         leading: CircleAvatar(
-                          backgroundImage:
-                              AssetImage('assets/images/money_transfer.png'),
+                          backgroundColor: Colors.transparent,
+                          child: SvgPicture.asset(
+                            'assets/icons/money-wavy.svg',
+                            width: 28,
+                            height: 28,
+                          ),
                         ),
                         title: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -155,8 +138,12 @@ class _HomeScreenState extends State<HomeShell> {
                           context.go('/transfer');
                         },
                         leading: CircleAvatar(
-                          backgroundImage:
-                              AssetImage('assets/images/add_money.png'),
+                          backgroundColor: Colors.transparent,
+                          child: SvgPicture.asset(
+                            'assets/icons/wallet.svg',
+                            width: 28,
+                            height: 28,
+                          ),
                         ),
                         title: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -195,20 +182,29 @@ class _HomeScreenState extends State<HomeShell> {
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 Card.outlined(
-                  color: Colors.transparent,
+                  color: Colors.white,
                   child: Column(
                     children: [
                       ListTile(
-                        leading: const Icon(Icons.money),
+                        leading: CircleAvatar(
+                          backgroundColor: Colors.transparent,
+                          child: SvgPicture.asset(
+                            'assets/icons/receipt.svg',
+                            width: 28,
+                            height: 28,
+                          ),
+                        ),
                         title: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            if (widget.transactions == false)
+                            if (!context.watch<TransactionsProvider>().hasTransactions)
                               const Text(
                                 'No transactions yet',
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
-                                    fontSize: 13, fontWeight: FontWeight(300), ),
+                                  fontSize: 13,
+                                  fontWeight: FontWeight(300),
+                                ),
                               ),
                           ],
                         ),
@@ -221,49 +217,35 @@ class _HomeScreenState extends State<HomeShell> {
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                 ),
                 Card.outlined(
-                  color: Colors.transparent,
+                  color: Colors.white,
                   child: Column(
                     children: [
-                      ListTile(
-                        leading: const Icon(Icons.money),
-                        onTap: (){
-                          context.go('/transfer');
-                        },
-                        title: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: const [
-                            Text('Receive Money'),
-                            Text('Paid directly into your account'),
-                          ],
-                        ),
-                        trailing: SvgPicture.asset(
-                          'assets/icons/caret-right.svg',
-                          width: 24,
-                          height: 24,
-                          colorFilter:
-                              ColorFilter.mode(Colors.blue, BlendMode.srcIn),
-                        ),
-                      ),
-                      ListTile(
-                        onTap: () {
-                          context.go('/transfer');
-                        },
-                        leading: const Icon(Icons.money),
-                        title: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: const [
-                            Text('Add Money'),
-                            Text('Get more from your account'),
-                          ],
-                        ),
-                        trailing: SvgPicture.asset(
-                          'assets/icons/caret-right.svg',
-                          width: 24,
-                          height: 24,
-                          colorFilter:
-                              ColorFilter.mode(Colors.blue, BlendMode.srcIn),
-                        ),
-                      ),
+                      if (!context.watch<TransactionsProvider>().hasTransactions) ...[
+                        const SizedBox(height: 10,),
+                        const Text('You have no transactions here'),
+                        const SizedBox(height: 50,),
+                        Padding(
+                          padding: const EdgeInsets.all(10.0),
+                          child: SizedBox(
+                            width: 350,
+                            height: 40,
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.blue,
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadiusGeometry.circular(5)
+                                )
+                              ),
+                              onPressed: () {},
+                              child: const Text(
+                                'Make a transaction',
+                                style: TextStyle(fontSize: 18),
+                              ),
+                            ),
+                          ),
+                        )
+                      ]
                     ],
                   ),
                 ),
