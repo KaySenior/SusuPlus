@@ -189,6 +189,7 @@ class _HomeScreenState extends State<HomeShell> {
               spacing: 8,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                //? Recently paid section
                 const Text(
                   'Recently paid',
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
@@ -204,9 +205,10 @@ class _HomeScreenState extends State<HomeShell> {
                           children: [
                             if (widget.transactions == false)
                               const Text(
-                                'Make a transaction',
+                                'No transactions yet',
+                                textAlign: TextAlign.center,
                                 style: TextStyle(
-                                    fontSize: 13, fontWeight: FontWeight(300)),
+                                    fontSize: 13, fontWeight: FontWeight(300), ),
                               ),
                           ],
                         ),
@@ -224,6 +226,9 @@ class _HomeScreenState extends State<HomeShell> {
                     children: [
                       ListTile(
                         leading: const Icon(Icons.money),
+                        onTap: (){
+                          context.go('/transfer');
+                        },
                         title: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: const [

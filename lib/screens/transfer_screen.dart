@@ -1,15 +1,5 @@
-import "package:flutter/material.dart";
-import '../routes/routes.dart';
-import 'package:go_router/go_router.dart';
+import 'package:flutter/material.dart';
 
-void main() {}
-
-// class TransferScrenn extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold();
-//   }
-// }
 class TransferScreen extends StatefulWidget {
   const TransferScreen({super.key});
 
@@ -18,135 +8,90 @@ class TransferScreen extends StatefulWidget {
 }
 
 class _TransferScreenState extends State<TransferScreen> {
+  bool _circleChecked = false;
+  bool value = false;
+  bool dropdown_value = false;
+  String date = 'Todays_date';
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        centerTitle: true,
-        automaticallyImplyLeading: true,
-        elevation: 15,
-        shadowColor: const Color.fromARGB(66, 36, 22, 22),
-        backgroundColor: Colors.white,
         title: Text(
           'Transfer',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 25,
-          ),
+          style: TextStyle(fontSize: 18),
         ),
+        centerTitle: true,
       ),
       body: SingleChildScrollView(
-        child: Container(
-          width: double.infinity,
-          height: 800,
-          child: Stack(
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            spacing: 10,
+            //   mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.max,
+
             children: [
-              Positioned(
-                left: 0,
-                right: 0,
-                top: 20,
-                child: Center(
-                  child: Text(
-                    'Amount',
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
+              Text('Amount'),
+              TextField(
+                decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.green))),
+              ),
+              Column(
+                children: [
+                  ListTile(
+                    title: Text(
+                      'Recurring',
+                      style: TextStyle(fontSize: 15),
                     ),
+                    trailing: Checkbox(
+                        shape: CircleBorder(),
+                        value: _circleChecked,
+                        onChanged: (bool? value) {
+                          setState(() {
+                            _circleChecked = value ?? false;
+                          });
+                        }),
                   ),
-                ),
-              ),
-              Positioned(
-                left: 8,
-                right: 8,
-                top: 60,
-                child: Container(
-                  width: 320,
-                  height: 45,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    border: BoxBorder.all(width: 2),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 8,
-                right: 8,
-                top: 150,
-                child: Container(
-                  child: Column(
-                    children: [
-                      ListTile(
-                        leading: Text('From',
-                            style: TextStyle(
-                              fontWeight: FontWeight(400),
-                              fontSize: 20,
-                            )),
-                        // tileColor: Colors.white,
-                        trailing: Icon(Icons.arrow_drop_down),
-                      ),
-                      ListTile(
-                        leading: Text('To',
-                            style: TextStyle(
-                              fontWeight: FontWeight(400),
-                              fontSize: 20,
-                            )),
-                        // tileColor: Colors.white,
-                        trailing: Icon(Icons.arrow_drop_down),
-                      ),
-                      ListTile(
-                        leading: Text(
-                          'Date',
-                          style: TextStyle(
-                            fontWeight: FontWeight(400),
-                            fontSize: 20,
-                          ),
-                        ),
-                        // tileColor: Colors.white,
-                        trailing: Icon(Icons.arrow_drop_down),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 8,
-                right: 8,
-                top: 400,
-                bottom: 0,
-                child: Text(
-                  ''' Lorem ipsum dolor sit amet consectetur adipisicing elit. Quam eaque veritatis nulla, harum quasi totam ea eveniet est ab enim cupiditate id quaerat mollitia adipisci? Amet asperiores beatae magni debitis. Lorem ipsum dolor sit amet consectetur adipisicing elit. Quam eaque veritatis nulla, harum quasi totam ea eveniet est ab enim cupiditate id quaerat mollitia adipisci? Amet asperiores beatae magni debitis.''',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              Positioned(
-                bottom: 55,
-                left: 8,
-                right: 8,
-                child: Center(
-                  child: SizedBox(
-                    width: 500,
-                    height: 64,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        context.go('/homepage');
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color.fromARGB(255, 144, 150, 155),
-                      ),
-                      child: Text(
-                        'Continue',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight(500),
-                          fontSize: 25,
-                        ),
+                  const Divider(),
+                  ListTile(
+                    title: Text('From'),
+                    trailing: SizedBox(
+                      width: 200,
+                      height: 30,
+                      child: TextField(
+                        decoration: InputDecoration(
+                            fillColor: Colors.green,
+                            border: OutlineInputBorder()),
                       ),
                     ),
                   ),
-                ),
+                  const Divider(),
+                  ListTile(
+                    title: Text('To'),
+                    trailing: DropdownButton(
+                        items: [], onChanged: (dropdown_value) {}),
+                  ),
+                  const Divider(),
+                  ListTile(
+                    title: Text("Date"),
+                    trailing: Text('$date'),
+                  ),
+                  const Divider(),
+                ],
               ),
+              Text(
+                  'Disclaimer: By proceeding with this transaction, you confirm that you have verified the recipients account number, phone number, and/or card details are accurate and belong to the intended recipient. We are not responsible for funds sent to an incorrect or unintended recipient due to inaccurate details entered by the sender. Transactions to a wrong number or card may be irreversible and are not guaranteed to be refunded. Please review all details carefully before confirming payment.'),
+                  const SizedBox(height: 50,),
+              SizedBox(
+                width: 300,
+                height: 50,
+                  child:
+                      ElevatedButton(style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue.shade400,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5)))
+                      ), onPressed: () {}, child: Text("Continue")))
             ],
           ),
         ),

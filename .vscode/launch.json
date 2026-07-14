@@ -1,0 +1,65 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "susu",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "susu (profile mode)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "susu (release mode)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release"
+        },
+        {
+            "name": "firebase_auth-6.5.4",
+            "cwd": "build/ios/SourcePackages/firebase_auth-6.5.4",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "firebase_auth-6.5.4 (profile mode)",
+            "cwd": "build/ios/SourcePackages/firebase_auth-6.5.4",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "firebase_auth-6.5.4 (release mode)",
+            "cwd": "build/ios/SourcePackages/firebase_auth-6.5.4",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release"
+        },
+        {
+            "name": "firebase_auth-6.5.4",
+            "cwd": "build/macos/SourcePackages/firebase_auth-6.5.4",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "firebase_auth-6.5.4 (profile mode)",
+            "cwd": "build/macos/SourcePackages/firebase_auth-6.5.4",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "firebase_auth-6.5.4 (release mode)",
+            "cwd": "build/macos/SourcePackages/firebase_auth-6.5.4",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release"
+        }
+    ]
+}
