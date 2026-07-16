@@ -69,22 +69,32 @@ class _HomeScreenState extends State<HomeShell> {
             Column(
               spacing: 12,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    CircleAvatar(
-                      backgroundColor: Colors.transparent,
-                      child: Image.asset('assets/images/atom.png'),
-                    ),
-                    const SizedBox(width: 8),
-                    const Text('Total Balance'),
-                  ],
-                ),
-                Text(
-                  '\$${context.watch<TransactionsProvider>().balance.toStringAsFixed(2)}',
-                  style: const TextStyle(fontSize: 25),
-                  textAlign: TextAlign.center,
-                ),
+                Card.outlined(
+                  color: Colors.white,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                    spacing: 10,  
+                    children: [
+                    Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      CircleAvatar(
+                        backgroundColor: Colors.transparent,
+                        child: Image.asset('assets/images/atom.png'),
+                      ),
+                      const SizedBox(width: 8),
+                      const Text('Total Balance'),
+                    ],
+                                    ),
+                                    Text(
+                    '\$${context.watch<TransactionsProvider>().balance.toStringAsFixed(2)}',
+                    style: const TextStyle(fontSize: 25),
+                    textAlign: TextAlign.center,
+                                    ),
+                    ],),
+                  ),
+                )
               ],
             ),
             Column(

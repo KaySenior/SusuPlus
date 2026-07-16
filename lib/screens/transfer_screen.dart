@@ -44,7 +44,7 @@ class _TransferScreenState extends State<TransferScreen> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.chevron_left, color: Colors.black87, size: 32),
-          onPressed: () => context.pop(),
+          onPressed: () => context.pop('/homepage'),
         ),
         title: const Text(
           'Transfer',
