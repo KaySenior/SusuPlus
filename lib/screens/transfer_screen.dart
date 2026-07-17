@@ -19,8 +19,18 @@ class _TransferScreenState extends State<TransferScreen> {
   final _toController = TextEditingController();
 
   static const _months = [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December'
   ];
 
   String get _date {
@@ -48,7 +58,8 @@ class _TransferScreenState extends State<TransferScreen> {
         ),
         title: const Text(
           'Transfer',
-          style: TextStyle(fontSize: 18, color: Colors.black87, fontWeight: FontWeight.w500),
+          style: TextStyle(
+              fontSize: 18, color: Colors.black87, fontWeight: FontWeight.w500),
         ),
         centerTitle: true,
       ),
@@ -130,7 +141,8 @@ class _TransferScreenState extends State<TransferScreen> {
               textAlign: TextAlign.center,
               style: const TextStyle(fontSize: 32, color: Colors.black87),
               decoration: const InputDecoration(border: InputBorder.none),
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              keyboardType:
+                  const TextInputType.numberWithOptions(decimal: true),
             ),
           ),
         ),
@@ -143,7 +155,7 @@ class _TransferScreenState extends State<TransferScreen> {
       label: 'Recurring',
       trailing: Switch(
         value: _recurring,
-        activeColor: Colors.white,
+        activeThumbColor: Colors.white,
         activeTrackColor: Colors.grey.shade400,
         onChanged: (v) => setState(() => _recurring = v),
       ),
@@ -236,13 +248,13 @@ class _TransferScreenState extends State<TransferScreen> {
           );
           if (success) {
             context.read<TransactionsProvider>().addTransaction(
-              Transaction(
-                id: reference,
-                title: 'Money added',
-                amount: amount,
-                date: DateTime.now(),
-              ),
-            );
+                  Transaction(
+                    id: reference,
+                    title: 'Money added',
+                    amount: amount,
+                    date: DateTime.now(),
+                  ),
+                );
             if (mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Payment successful!')),
@@ -252,7 +264,8 @@ class _TransferScreenState extends State<TransferScreen> {
           } else {
             if (mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Payment failed. Please try again.')),
+                const SnackBar(
+                    content: Text('Payment failed. Please try again.')),
               );
             }
           }

@@ -16,7 +16,8 @@ class SplashScreen extends StatelessWidget {
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Google sign-in failed. Please try again.')),
+          const SnackBar(
+              content: Text('Google sign-in failed. Please try again.')),
         );
       }
     }
@@ -32,7 +33,8 @@ class SplashScreen extends StatelessWidget {
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Apple sign-in failed. Please try again.')),
+          const SnackBar(
+              content: Text('Apple sign-in failed. Please try again.')),
         );
       }
     }
@@ -168,16 +170,28 @@ class SplashScreen extends StatelessWidget {
                                     ],
                                   ))),
                         ),
-                        Row(
-                          children: [
-                            const SizedBox(width: 25,),
-                            Text(
-                              "By continuing you agree to Susu's ",
-                              style: TextStyle(fontWeight: FontWeight(250)),
+                        SizedBox(
+                          width: double.infinity,
+                          height: 23,
+                          child: Center(
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // const SizedBox(width: 25,),
+
+                                Text(
+                                  "By continuing you agree to Susu's",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight(250),
+                                  ),
+                                ),
+                                Text(
+                                  "Terms of Use",
+                                  style: TextStyle(fontWeight: FontWeight(450)),
+                                ),
+                              ],
                             ),
-                            Text("Terms of Use",
-                                style: TextStyle(fontWeight: FontWeight(500)))
-                          ],
+                          ),
                         ),
                       ],
                     ),

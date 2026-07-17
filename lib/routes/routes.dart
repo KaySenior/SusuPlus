@@ -8,7 +8,6 @@ import '../screens/homepage.dart';
 import '../screens/settings.dart';
 import '../screens/loading_screen.dart';
 import '../screens/splashsreen.dart';
-import '../screens/profile_screen.dart';
 import '../screens/forgot_password_screen.dart';
 
 class AppRoutes {
