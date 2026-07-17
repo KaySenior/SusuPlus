@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
 class TransactionScreen extends StatefulWidget {
@@ -31,7 +32,7 @@ class _TransactionScreenState extends State<TransactionScreen> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.receipt_long_outlined, size: 80, color: Colors.grey.shade300),
+                    SvgPicture.asset('assets/icons/receipt.svg', width: 80, height: 80),
                     const SizedBox(height: 24),
                     const Text(
                       'No transactions yet',

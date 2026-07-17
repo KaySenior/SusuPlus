@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 
 class MomoService {
-  static const String _secretKey = 'sk_test_879aef0fa0a193c7a73f57cdbf54301aad8834ee';
+  static const String _secretKey = 'sk_test_872a8081e9d415c1e1325734749b63f49e42b7a4';
 
   static Future<bool> makePayment({
     required String email,

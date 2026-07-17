@@ -8,7 +8,7 @@ import '../screens/homepage.dart';
 import '../screens/settings.dart';
 import '../screens/loading_screen.dart';
 import '../screens/splashsreen.dart';
-import '../screens/profile_screen.dart';
+import '../screens/phone_auth_screen.dart';
 import '../screens/forgot_password_screen.dart';
 
 class AppRoutes {
@@ -23,10 +23,18 @@ class AppRoutes {
   static const String transfer = '/transfer';
   static const String profile = '/profile';
   static const String forgotPassword = '/forgot-password';
+  static const String phoneAuth = '/phone-auth';
 }
 
 final GoRouter appRouter = GoRouter(
   initialLocation: AppRoutes.home,
+  redirect: (context, state) {
+    final uri = state.uri.toString();
+    if (uri.contains('firebaseauth') || uri.contains('googleusercontent')) {
+      return AppRoutes.home;
+    }
+    return null;
+  },
   routes: [
     GoRoute(
         path: AppRoutes.home,
@@ -57,5 +65,9 @@ final GoRouter appRouter = GoRouter(
         path: AppRoutes.forgotPassword,
         builder: (BuildContext context, GoRouterState state) =>
             const ForgotPasswordScreen()),
+    GoRoute(
+        path: AppRoutes.phoneAuth,
+        builder: (BuildContext context, GoRouterState state) =>
+            const PhoneAuthScreen()),
   ],
 );
