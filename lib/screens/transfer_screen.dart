@@ -8,6 +8,7 @@ import 'package:susu/provider/provider.dart';
 import 'package:susu/models/transaction.dart';
 import 'package:susu/services/paystack_service.dart';
 import 'package:susu/widgets/custom_row.dart';
+import 'package:susu/core/notifier.dart';
 
 class TransferScreen extends StatefulWidget {
   const TransferScreen({super.key});
@@ -452,14 +453,13 @@ class _TransferScreenState extends State<TransferScreen> {
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (_) => _PaymentStatusDialog(
-          reference: reference,
-          amount: amount,
-        ),
+        builder: (_) => const Center(child: CircularProgressIndicator()),
       );
 
       final result = await PaystackService.verifyTransaction(reference: reference);
-      if (result != null && result['status'] == 'success') {
+      final success = result != null && result['status'] == 'success';
+
+      if (success) {
         await FirebaseFirestore.instance.collection('orders').doc(reference).update({
           'status': 'paid',
           'paidAt': FieldValue.serverTimestamp(),
@@ -469,6 +469,32 @@ class _TransferScreenState extends State<TransferScreen> {
           'status': 'failed',
         });
       }
+
+      if (!mounted) return;
+
+      if (mounted) Navigator.of(context, rootNavigator: true).pop();
+
+      await showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) => _PaymentStatusDialog(success: success),
+      );
+
+      if (!mounted) return;
+
+      if (success) {
+        context.read<TransactionsProvider>().addTransaction(
+          Transaction(
+            id: reference,
+            title: 'Money added',
+            amount: amount,
+            date: DateTime.now(),
+          ),
+        );
+      }
+
+      selectedPage.value = 0;
+      context.go('/homepage');
     } on PaystackException catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -490,9 +516,8 @@ class _TransferScreenState extends State<TransferScreen> {
 }
 
 class _PaymentStatusDialog extends StatefulWidget {
-  final String reference;
-  final double amount;
-  const _PaymentStatusDialog({required this.reference, required this.amount});
+  final bool success;
+  const _PaymentStatusDialog({required this.success});
 
   @override
   State<_PaymentStatusDialog> createState() => _PaymentStatusDialogState();
@@ -500,152 +525,80 @@ class _PaymentStatusDialog extends StatefulWidget {
 
 class _PaymentStatusDialogState extends State<_PaymentStatusDialog> {
   @override
+  void initState() {
+    super.initState();
+    Future.delayed(const Duration(seconds: 2), () {
+      if (mounted) Navigator.of(context, rootNavigator: true).pop();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return PopScope(
       canPop: false,
       child: AlertDialog(
-        content: StreamBuilder<DocumentSnapshot>(
-          stream: FirebaseFirestore.instance
-              .collection('orders')
-              .doc(widget.reference)
-              .snapshots(),
-          builder: (context, snapshot) {
-            final status = snapshot.data?['status'] as String?;
-
-            if (status == 'paid') {
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                if (mounted) _onSuccess(context);
-              });
-              return _buildSuccess();
-            }
-
-            if (status == 'failed') {
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                if (mounted) _onFailed(context);
-              });
-              return _buildFailed();
-            }
-
-            return _buildWaiting();
-          },
+        content: SizedBox(
+          width: 260,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 12),
+              if (widget.success) ...[
+                TweenAnimationBuilder<double>(
+                  tween: Tween(begin: 0.0, end: 1.0),
+                  duration: const Duration(milliseconds: 500),
+                  curve: Curves.elasticOut,
+                  builder: (_, scale, __) => Transform.scale(
+                    scale: scale,
+                    child: Container(
+                      width: 72,
+                      height: 72,
+                      decoration: const BoxDecoration(
+                        color: Color(0xFF22C55E),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.check, color: Colors.white, size: 40),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                const Text(
+                  'Payment Successful!',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: Color(0xFF22C55E)),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'Your money has been added.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 13, color: Colors.black54),
+                ),
+              ] else ...[
+                Container(
+                  width: 72,
+                  height: 72,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFEF4444),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.close, color: Colors.white, size: 40),
+                ),
+                const SizedBox(height: 20),
+                const Text(
+                  'Payment Failed',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: Color(0xFFEF4444)),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'Please try again.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 13, color: Colors.black54),
+                ),
+              ],
+              const SizedBox(height: 16),
+            ],
+          ),
         ),
       ),
     );
-  }
-
-  Widget _buildWaiting() {
-    return const SizedBox(
-      width: 260,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          SizedBox(height: 20),
-          SizedBox(width: 48, height: 48, child: CircularProgressIndicator(strokeWidth: 3)),
-          SizedBox(height: 24),
-          Text(
-            'Processing payment...',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-          ),
-          SizedBox(height: 8),
-          Text(
-            'Please wait while we confirm your transaction.',
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 13, color: Colors.black54),
-          ),
-          SizedBox(height: 12),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSuccess() {
-    return SizedBox(
-      width: 260,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const SizedBox(height: 12),
-          TweenAnimationBuilder<double>(
-            tween: Tween(begin: 0.0, end: 1.0),
-            duration: const Duration(milliseconds: 500),
-            curve: Curves.elasticOut,
-            builder: (_, scale, __) => Transform.scale(
-              scale: scale,
-              child: Container(
-                width: 72,
-                height: 72,
-                decoration: const BoxDecoration(
-                  color: Color(0xFF22C55E),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(Icons.check, color: Colors.white, size: 40),
-              ),
-            ),
-          ),
-          const SizedBox(height: 20),
-          const Text(
-            'Payment Successful!',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: Color(0xFF22C55E)),
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            'Your money has been added.',
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 13, color: Colors.black54),
-          ),
-          const SizedBox(height: 16),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildFailed() {
-    return SizedBox(
-      width: 260,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const SizedBox(height: 12),
-          Container(
-            width: 72,
-            height: 72,
-            decoration: const BoxDecoration(
-              color: Color(0xFFEF4444),
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(Icons.close, color: Colors.white, size: 40),
-          ),
-          const SizedBox(height: 20),
-          const Text(
-            'Payment Failed',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: Color(0xFFEF4444)),
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            'Please try again.',
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 13, color: Colors.black54),
-          ),
-          const SizedBox(height: 16),
-        ],
-      ),
-    );
-  }
-
-  void _onSuccess(BuildContext context) {
-    context.read<TransactionsProvider>().addTransaction(
-      Transaction(
-        id: widget.reference,
-        title: 'Money added',
-        amount: widget.amount,
-        date: DateTime.now(),
-      ),
-    );
-    Navigator.of(context).pop();
-    Navigator.of(context).pop();
-  }
-
-  void _onFailed(BuildContext context) {
-    Navigator.of(context).pop();
   }
 }

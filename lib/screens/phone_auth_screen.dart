@@ -184,18 +184,16 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
     }
   }
 
-  void _showOtpDialog(String phone, String verificationId) {
-    showDialog(
+  void _showOtpDialog(String phone, String verificationId) async {
+    await showDialog(
       context: context,
       barrierDismissible: false,
       builder: (ctx) => _OtpDialog(
         verificationId: verificationId,
-        onVerified: () {
-          Navigator.of(ctx).pop();
-          context.go('/homepage');
-        },
+        onVerified: () => Navigator.of(ctx).pop(),
       ),
     );
+    if (mounted) context.go('/homepage');
   }
 
   @override

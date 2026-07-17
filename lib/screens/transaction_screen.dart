@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import 'package:susu/provider/provider.dart';
 
 class TransactionScreen extends StatefulWidget {
   const TransactionScreen({super.key});
@@ -10,10 +12,10 @@ class TransactionScreen extends StatefulWidget {
 }
 
 class _TransactionScreenState extends State<TransactionScreen> {
-  bool transactions = false;
-
   @override
   Widget build(BuildContext context) {
+    final items = context.watch<TransactionsProvider>().transactions;
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -25,7 +27,7 @@ class _TransactionScreenState extends State<TransactionScreen> {
         centerTitle: true,
       ),
       backgroundColor: Colors.white,
-      body: !transactions
+      body: items.isEmpty
           ? Center(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 40),
@@ -65,7 +67,63 @@ class _TransactionScreenState extends State<TransactionScreen> {
                 ),
               ),
             )
-          : const SizedBox.shrink(),
+          : ListView.separated(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              itemCount: items.length,
+              separatorBuilder: (_, __) => const Divider(height: 1),
+              itemBuilder: (context, i) {
+                final tx = items.reversed.toList()[i];
+                final isCredit = tx.amount > 0;
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 44,
+                        height: 44,
+                        decoration: BoxDecoration(
+                          color: isCredit
+                              ? const Color(0xFF22C55E).withValues(alpha: 0.1)
+                              : const Color(0xFFEF4444).withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Icon(
+                          isCredit ? Icons.arrow_downward : Icons.arrow_upward,
+                          color: isCredit ? const Color(0xFF22C55E) : const Color(0xFFEF4444),
+                          size: 22,
+                        ),
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(tx.title,
+                                style: const TextStyle(
+                                    fontSize: 15, fontWeight: FontWeight.w500)),
+                            const SizedBox(height: 2),
+                            Text(
+                              '${tx.date.day}/${tx.date.month}/${tx.date.year}',
+                              style: TextStyle(fontSize: 13, color: Colors.grey.shade500),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Text(
+                        isCredit
+                            ? '+₵${tx.amount.toStringAsFixed(2)}'
+                            : '-₵${tx.amount.toStringAsFixed(2)}',
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: isCredit ? const Color(0xFF22C55E) : Colors.black87,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
     );
   }
 }
