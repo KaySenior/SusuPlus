@@ -1,7 +1,7 @@
 import 'package:go_router/go_router.dart';
-import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 import 'package:susu/services/auth_service.dart';
 
 class SplashScreen extends StatelessWidget {
@@ -18,23 +18,6 @@ class SplashScreen extends StatelessWidget {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
               content: Text('Google sign-in failed. Please try again.')),
-        );
-      }
-    }
-  }
-
-  //!Apple requires a developer subscription to enable apple sign in so this wont work
-  Future<void> _signInWithApple(BuildContext context) async {
-    try {
-      final user = await AuthService.signInWithApple();
-      if (user != null && context.mounted) {
-        context.go('/homepage');
-      }
-    } catch (e) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text('Apple sign-in failed. Please try again.')),
         );
       }
     }
@@ -99,12 +82,32 @@ class SplashScreen extends StatelessWidget {
                     Column(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        SignInWithAppleButton(
-                          onPressed: () => _signInWithApple(context),
-                          height: 50,
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(15)),
-                          text: 'Continue with Apple',
+                        ElevatedButton(
+                          onPressed: () => context.go('/phone-auth'),
+                          style: ElevatedButton.styleFrom(
+                            foregroundColor: Colors.white,
+                            backgroundColor: Colors.black,
+                            minimumSize: const Size(double.infinity, 50),
+                            elevation: 0,
+                            shape: const RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(15)),
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(PhosphorIcons.phone, size: 20),
+                              SizedBox(width: 12),
+                              const Text(
+                                'Continue with Phone',
+                                style: TextStyle(
+                                  fontSize: 19,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                         const SizedBox(height: 12),
                         ElevatedButton(

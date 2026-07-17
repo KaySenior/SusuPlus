@@ -1,1 +1,47 @@
-{"flutter":{"platforms":{"android":{"default":{"projectId":"susuplus-61a6c","appId":"1:101788503516:android:91645cf432118aec511319","fileOutput":"android/app/google-services.json"}},"ios":{"default":{"projectId":"susuplus-61a6c","appId":"1:101788503516:ios:91eb8e929a58977a511319","uploadDebugSymbols":false,"fileOutput":"ios/Runner/GoogleService-Info.plist"}},"dart":{"lib/firebase_options.dart":{"projectId":"susuplus-61a6c","configurations":{"android":"1:101788503516:android:91645cf432118aec511319","ios":"1:101788503516:ios:91eb8e929a58977a511319","macos":"1:101788503516:ios:91eb8e929a58977a511319","web":"1:101788503516:web:e268d46350e0bf21511319","windows":"1:101788503516:web:57830c2e44499aea511319"}}}}}}
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "susuplus-61a6c",
+          "appId": "1:101788503516:android:91645cf432118aec511319",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "ios": {
+        "default": {
+          "projectId": "susuplus-61a6c",
+          "appId": "1:101788503516:ios:91eb8e929a58977a511319",
+          "uploadDebugSymbols": false,
+          "fileOutput": "ios/Runner/GoogleService-Info.plist"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "susuplus-61a6c",
+          "configurations": {
+            "android": "1:101788503516:android:91645cf432118aec511319",
+            "ios": "1:101788503516:ios:91eb8e929a58977a511319"
+          }
+        }
+      }
+    }
+  },
+  "functions": [
+    {
+      "source": "functions",
+      "codebase": "default",
+      "disallowLegacyRuntimeConfig": true,
+      "ignore": [
+        "node_modules",
+        ".git",
+        "firebase-debug.log",
+        "firebase-debug.*.log",
+        "*.local"
+      ],
+      "predeploy": [
+        "npm --prefix \"$RESOURCE_DIR\" run lint"
+      ]
+    }
+  ]
+}

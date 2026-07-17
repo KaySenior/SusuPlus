@@ -15,8 +15,12 @@ class TransferScreen extends StatefulWidget {
 
 class _TransferScreenState extends State<TransferScreen> {
   bool _recurring = false;
+  String _frequency = 'Monthly';
   final _amountController = TextEditingController(text: '1.00');
   final _toController = TextEditingController();
+  final _fromController = TextEditingController();
+
+  static const _frequencies = ['Daily', 'Weekly', 'Monthly', 'Yearly'];
 
   static const _months = [
     'January',
@@ -42,24 +46,25 @@ class _TransferScreenState extends State<TransferScreen> {
   void dispose() {
     _amountController.dispose();
     _toController.dispose();
+    _fromController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFF5F7FA),
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.chevron_left, color: Colors.black87, size: 32),
-          onPressed: () => context.pop('/homepage'),
+          icon: const Icon(Icons.arrow_back, color: Colors.black87, size: 24),
+          onPressed: () => context.go('/homepage'),
         ),
         title: const Text(
           'Transfer',
           style: TextStyle(
-              fontSize: 18, color: Colors.black87, fontWeight: FontWeight.w500),
+              fontSize: 18, color: Colors.black87, fontWeight: FontWeight.w600),
         ),
         centerTitle: true,
       ),
@@ -67,113 +72,191 @@ class _TransferScreenState extends State<TransferScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Divider(height: 1),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const SizedBox(height: 24),
-                  _amountField(),
-                  const SizedBox(height: 24),
-                ],
-              ),
+            const SizedBox(height: 20),
+            _section(
+              child: _amountField(),
             ),
-            const Divider(height: 1),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
+            const SizedBox(height: 12),
+            _section(
               child: _recurringRow(),
             ),
-            const Divider(height: 1),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: _fromRow(),
-            ),
-            const Divider(height: 1),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: _toRow(),
-            ),
-            const Divider(height: 1),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: _dateRow(),
-            ),
-            const Divider(height: 1),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
+            const SizedBox(height: 12),
+            _section(
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const SizedBox(height: 24),
-                  _disclaimer(),
-                  const SizedBox(height: 40),
-                  _continueButton(),
-                  const SizedBox(height: 24),
+                  _toRow(),
+                  if (_transferTo == 'number')
+                    const Divider(height: 1, indent: 0),
+                  _fromRow(),
+                  const Divider(height: 1, indent: 0),
+                  _dateRow(),
                 ],
               ),
             ),
+            const SizedBox(height: 24),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: _disclaimer(),
+            ),
+            const SizedBox(height: 24),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: _continueButton(),
+            ),
+            const SizedBox(height: 32),
           ],
         ),
       ),
     );
   }
 
-  Widget _amountField() {
-    return Column(
-      children: [
-        const Center(
-          child: Text(
-            'Amount',
-            style: TextStyle(fontSize: 15, color: Colors.black87),
+  Widget _section({required Widget child}) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
           ),
-        ),
-        const SizedBox(height: 12),
-        Container(
-          height: 80,
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.blue.shade600, width: 2),
-            borderRadius: BorderRadius.circular(4),
-          ),
-          child: Center(
-            child: TextField(
-              controller: _amountController,
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 32, color: Colors.black87),
-              decoration: const InputDecoration(border: InputBorder.none),
-              keyboardType:
-                  const TextInputType.numberWithOptions(decimal: true),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _recurringRow() {
-    return CustomRow(
-      label: 'Recurring',
-      trailing: Switch(
-        value: _recurring,
-        activeThumbColor: Colors.white,
-        activeTrackColor: Colors.grey.shade400,
-        onChanged: (v) => setState(() => _recurring = v),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: child,
       ),
     );
   }
 
-  Widget _fromRow() {
+  Widget _amountField() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 20),
+      child: Column(
+        children: [
+          const Text(
+            'Amount',
+            style: TextStyle(
+                fontSize: 14,
+                color: Colors.black54,
+                fontWeight: FontWeight.w500),
+          ),
+          const SizedBox(height: 8),
+          Container(
+            height: 72,
+            decoration: BoxDecoration(
+              color: const Color(0xFFF0F4FF),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Center(
+              child: SizedBox(
+                width: 200,
+                child: TextField(
+                  controller: _amountController,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                      fontSize: 32,
+                      color: Colors.black87,
+                      fontWeight: FontWeight.w600),
+                  decoration: InputDecoration(
+                    border: InputBorder.none,
+                    hintText: '₵0.00',
+                    hintStyle: TextStyle(
+                        fontSize: 28,
+                        color: Colors.black.withOpacity(0.15),
+                        fontWeight: FontWeight.w600),
+                    isDense: true,
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                  keyboardType:
+                      const TextInputType.numberWithOptions(decimal: true),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _recurringRow() {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4),
+          child: CustomRow(
+            label: 'Recurring',
+            trailing: Switch(
+              value: _recurring,
+              activeColor: const Color(0xFF1E6FD9),
+              activeTrackColor: const Color(0xFF1E6FD9).withOpacity(0.4),
+              onChanged: (v) => setState(() => _recurring = v),
+            ),
+          ),
+        ),
+        if (_recurring) ...[
+          const Divider(height: 1, indent: 0),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('Frequency',
+                    style: TextStyle(fontSize: 16, color: Colors.black87)),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: const Color(0xFFE0E0E0)),
+                  ),
+                  child: DropdownButton<String>(
+                    value: _frequency,
+                    underline: const SizedBox(),
+                    items: _frequencies
+                        .map((f) => DropdownMenuItem(
+                              value: f,
+                              child:
+                                  Text(f, style: const TextStyle(fontSize: 14)),
+                            ))
+                        .toList(),
+                    onChanged: (v) {
+                      if (v != null) setState(() => _frequency = v);
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _accountField(
+      {required String label, required TextEditingController controller}) {
     return CustomRow(
-      label: 'From number',
+      label: label,
       trailing: SizedBox(
         width: 200,
-        height: 30,
+        height: 36,
         child: TextField(
-          controller: _toController,
+          controller: controller,
           keyboardType: TextInputType.number,
-          decoration: const InputDecoration(
-            border: OutlineInputBorder(),
-            contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+          decoration: InputDecoration(
+            hintText: 'Enter number',
+            hintStyle: const TextStyle(fontSize: 13, color: Colors.black38),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
+            ),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
           ),
           style: const TextStyle(fontSize: 14),
         ),
@@ -181,13 +264,106 @@ class _TransferScreenState extends State<TransferScreen> {
     );
   }
 
+  String _transferTo = 'number';
+
   Widget _toRow() {
-    return const CustomDropdownRow(
-      label: 'To',
-      value: 'Your account',
-      boxLabel: '••••',
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text('Transfer to',
+                  style: TextStyle(fontSize: 16, color: Colors.black87)),
+              Container(
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF0F4FF),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  children: [
+                    GestureDetector(
+                      onTap: () => setState(() => _transferTo = 'number'),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 14, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: _transferTo == 'number'
+                              ? const Color(0xFF1E6FD9)
+                              : Colors.transparent,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          'Number',
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                            color: _transferTo == 'number'
+                                ? Colors.white
+                                : Colors.black54,
+                          ),
+                        ),
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () => setState(() => _transferTo = 'account'),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 14, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: _transferTo == 'account'
+                              ? const Color(0xFF1E6FD9)
+                              : Colors.transparent,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          'Your account',
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                            color: _transferTo == 'account'
+                                ? Colors.white
+                                : Colors.black54,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        if (_transferTo == 'number')
+          Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: TextField(
+              controller: _toController,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                hintText: 'Enter phone number',
+                hintStyle: const TextStyle(fontSize: 14, color: Colors.black38),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
+                ),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              ),
+              style: const TextStyle(fontSize: 15),
+            ),
+          ),
+      ],
     );
   }
+
+  Widget _fromRow() =>
+      _accountField(label: 'Transfer from', controller: _fromController);
 
   Widget _dateRow() {
     return CustomRow(
@@ -211,12 +387,12 @@ class _TransferScreenState extends State<TransferScreen> {
       children: const [
         Text(
           'Disclaimer: By proceeding with this transaction, you confirm that you have verified the recipients account number, phone number, and/or card details are accurate and belong to the intended recipient. We are not responsible for funds sent to an incorrect or unintended recipient due to inaccurate details entered by the sender. Transactions to a wrong number or card may be irreversible and are not guaranteed to be refunded. Please review all details carefully before confirming payment.',
-          style: TextStyle(fontSize: 13, color: Colors.black54, height: 1.4),
+          style: TextStyle(fontSize: 12, color: Colors.black45, height: 1.5),
         ),
-        SizedBox(height: 16),
+        SizedBox(height: 12),
         Text(
           'You agree to release us SusuPlus of any liability',
-          style: TextStyle(fontSize: 13, color: Colors.black54, height: 1.4),
+          style: TextStyle(fontSize: 12, color: Colors.black45, height: 1.5),
         ),
       ],
     );
@@ -228,7 +404,8 @@ class _TransferScreenState extends State<TransferScreen> {
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xFF1E6FD9),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           elevation: 0,
         ),
         onPressed: () async {
@@ -260,7 +437,7 @@ class _TransferScreenState extends State<TransferScreen> {
                 const SnackBar(content: Text('Payment successful!')),
               );
             }
-            context.pop();
+            context.go('/homepage');
           } else {
             if (mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
@@ -272,7 +449,8 @@ class _TransferScreenState extends State<TransferScreen> {
         },
         child: const Text(
           'Continue',
-          style: TextStyle(fontSize: 17, color: Colors.white),
+          style: TextStyle(
+              fontSize: 17, color: Colors.white, fontWeight: FontWeight.w600),
         ),
       ),
     );

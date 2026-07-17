@@ -1,6 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 class AuthService {
   static final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -63,32 +62,42 @@ class AuthService {
     }
   }
 
-  static Future<User?> signInWithApple() async {
-    try {
-      final appleCredential = await SignInWithApple.getAppleIDCredential(
-        scopes: [
-          AppleIDAuthorizationScopes.email,
-          AppleIDAuthorizationScopes.fullName,
-        ],
-      );
+  static String? _verificationId;
 
-      final credential = OAuthProvider('apple.com').credential(
-        idToken: appleCredential.identityToken,
-        accessToken: appleCredential.authorizationCode,
-      );
+  static Future<void> sendOTP({
+    required String phoneNumber,
+    required Function(String verificationId) onCodeSent,
+    required Function(String error) onError,
+    required Function() onAutoVerified,
+  }) async {
+    await _auth.setSettings(appVerificationDisabledForTesting: true);
+    await _auth.verifyPhoneNumber(
+      phoneNumber: phoneNumber,
+      verificationCompleted: (phoneAuthCredential) async {
+        await _auth.signInWithCredential(phoneAuthCredential);
+        onAutoVerified();
+      },
+      verificationFailed: (error) {
+        onError(error.message ?? 'Verification failed');
+      },
+      codeSent: (verificationId, forceResendingToken) {
+        _verificationId = verificationId;
+        onCodeSent(verificationId);
+      },
+      codeAutoRetrievalTimeout: (verificationId) {
+        _verificationId = verificationId;
+      },
+    );
+  }
 
-      final UserCredential userCredential =
-          await _auth.signInWithCredential(credential);
-
-      print('Successfully signed in with Apple: ${userCredential.user?.email}');
-      return userCredential.user;
-    } on FirebaseAuthException catch (e) {
-      print('Firebase Auth Error: ${e.code} - ${e.message}');
-      rethrow;
-    } catch (e) {
-      print('Error during Apple Sign-In: $e');
-      rethrow;
-    }
+  static Future<User?> verifyOTP(String smsCode) async {
+    if (_verificationId == null) return null;
+    final credential = PhoneAuthProvider.credential(
+      verificationId: _verificationId!,
+      smsCode: smsCode,
+    );
+    final userCredential = await _auth.signInWithCredential(credential);
+    return userCredential.user;
   }
 
   static Future<void> sendPasswordResetEmail(String email) async {
