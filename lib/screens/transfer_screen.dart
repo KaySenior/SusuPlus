@@ -118,7 +118,7 @@ class _TransferScreenState extends State<TransferScreen> {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -165,7 +165,7 @@ class _TransferScreenState extends State<TransferScreen> {
                     hintText: '₵0.00',
                     hintStyle: TextStyle(
                         fontSize: 28,
-                        color: Colors.black.withOpacity(0.15),
+                        color: Colors.black.withValues(alpha: 0.15),
                         fontWeight: FontWeight.w600),
                     isDense: true,
                     contentPadding: EdgeInsets.zero,
@@ -190,8 +190,8 @@ class _TransferScreenState extends State<TransferScreen> {
             label: 'Recurring',
             trailing: Switch(
               value: _recurring,
-              activeColor: const Color(0xFF1E6FD9),
-              activeTrackColor: const Color(0xFF1E6FD9).withOpacity(0.4),
+              activeThumbColor: const Color(0xFF1E6FD9),
+              activeTrackColor: const Color(0xFF1E6FD9).withValues(alpha: 0.4),
               onChanged: (v) => setState(() => _recurring = v),
             ),
           ),
