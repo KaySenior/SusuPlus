@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class AuthService {
@@ -36,7 +37,7 @@ class AuthService {
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
 
       if (googleUser == null) {
-        print('Google Sign-In cancelled by user');
+        debugPrint('Google Sign-In cancelled by user');
         return null;
       }
 
@@ -51,13 +52,13 @@ class AuthService {
       final UserCredential userCredential =
           await _auth.signInWithCredential(credential);
 
-      print('Successfully signed in: ${userCredential.user?.email}');
+      debugPrint('Successfully signed in: ${userCredential.user?.email}');
       return userCredential.user;
     } on FirebaseAuthException catch (e) {
-      print('Firebase Auth Error: ${e.code} - ${e.message}');
+      debugPrint('Firebase Auth Error: ${e.code} - ${e.message}');
       rethrow;
     } catch (e) {
-      print('Error during Google Sign-In: $e');
+      debugPrint('Error during Google Sign-In: $e');
       rethrow;
     }
   }
@@ -70,7 +71,11 @@ class AuthService {
     required Function(String error) onError,
     required Function() onAutoVerified,
   }) async {
-    await _auth.setSettings(appVerificationDisabledForTesting: true);
+    try {
+      await _auth.setSettings(appVerificationDisabledForTesting: true);
+    } catch (_) {
+      // Ignore — only works with whitelisted test numbers
+    }
     await _auth.verifyPhoneNumber(
       phoneNumber: phoneNumber,
       verificationCompleted: (phoneAuthCredential) async {
@@ -103,20 +108,24 @@ class AuthService {
   static Future<void> sendPasswordResetEmail(String email) async {
     try {
       await _auth.sendPasswordResetEmail(email: email);
-      print('Password reset email sent to $email');
+      debugPrint('Password reset email sent to $email');
     } on FirebaseAuthException catch (e) {
-      print('Firebase Auth Error: ${e.code} - ${e.message}');
+      debugPrint('Firebase Auth Error: ${e.code} - ${e.message}');
       rethrow;
     }
+  }
+
+  static Future<UserCredential> signInWithCredential(PhoneAuthCredential credential) {
+    return _auth.signInWithCredential(credential);
   }
 
   static Future<void> signOut() async {
     try {
       await _auth.signOut();
       await _googleSignIn.signOut();
-      print('User signed out');
+      debugPrint('User signed out');
     } catch (e) {
-      print('Error signing out: $e');
+      debugPrint('Error signing out: $e');
       rethrow;
     }
   }

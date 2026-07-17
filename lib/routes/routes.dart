@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:susu/screens/payment_screen.dart';
+import 'package:susu/screens/password_setup_screen.dart';
 import 'package:susu/screens/profile_screen.dart';
 import 'package:susu/screens/transfer_screen.dart';
 import '../screens/signup_screen.dart';
@@ -21,6 +23,8 @@ class AppRoutes {
   static const String settings = '/settings';
   static const String loading = '/loading';
   static const String transfer = '/transfer';
+  static const String payment = '/payment';
+  static const String passwordSetup = '/password-setup';
   static const String profile = '/profile';
   static const String forgotPassword = '/forgot-password';
   static const String phoneAuth = '/phone-auth';
@@ -60,6 +64,18 @@ final GoRouter appRouter = GoRouter(
         path: AppRoutes.transfer,
         builder: (BuildContext context, GoRouterState state) =>
             TransferScreen()),
+    GoRoute(
+        path: AppRoutes.payment,
+        builder: (BuildContext context, GoRouterState state) {
+          final amount = double.tryParse(state.uri.queryParameters['amount'] ?? '') ?? 0;
+          return PaymentScreen(amount: amount);
+        }),
+    GoRoute(
+        path: AppRoutes.passwordSetup,
+        builder: (BuildContext context, GoRouterState state) {
+          final phone = state.extra as String? ?? '';
+          return PasswordSetupScreen(phoneNumber: phone);
+        }),
     GoRoute(path: AppRoutes.profile, builder: (BuildContext context, GoRouterState state)=> ProfileScreen()),
     GoRoute(
         path: AppRoutes.forgotPassword,

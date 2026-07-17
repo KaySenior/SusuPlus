@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart' hide Transaction;
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 import 'package:susu/provider/provider.dart';
 import 'package:susu/models/transaction.dart';
-import 'package:susu/services/momo_service.dart';
+import 'package:susu/services/paystack_service.dart';
 import 'package:susu/widgets/custom_row.dart';
 
 class TransferScreen extends StatefulWidget {
@@ -106,7 +109,7 @@ class _TransferScreenState extends State<TransferScreen> {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -145,7 +148,7 @@ class _TransferScreenState extends State<TransferScreen> {
                   decoration: InputDecoration(
                     border: InputBorder.none,
                     hintText: '₵0.00',
-                    hintStyle: TextStyle(fontSize: 28, color: Colors.black.withOpacity(0.15), fontWeight: FontWeight.w600),
+                    hintStyle: TextStyle(fontSize: 28, color: Colors.black.withValues(alpha: 0.15), fontWeight: FontWeight.w600),
                     isDense: true,
                     contentPadding: EdgeInsets.zero,
                   ),
@@ -168,8 +171,8 @@ class _TransferScreenState extends State<TransferScreen> {
             label: 'Recurring',
             trailing: Switch(
               value: _recurring,
-              activeColor: const Color(0xFF1E6FD9),
-              activeTrackColor: const Color(0xFF1E6FD9).withOpacity(0.4),
+              activeThumbColor: const Color(0xFF1E6FD9),
+              activeTrackColor: const Color(0xFF1E6FD9).withValues(alpha: 0.4),
               onChanged: (v) => setState(() => _recurring = v),
             ),
           ),
@@ -366,49 +369,283 @@ class _TransferScreenState extends State<TransferScreen> {
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           elevation: 0,
         ),
-        onPressed: () async {
-          final amount = double.tryParse(_amountController.text) ?? 0;
-          if (amount <= 0) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Please enter a valid amount.')),
-            );
-            return;
-          }
-          final email = 'customer@email.com';
-          final reference = DateTime.now().millisecondsSinceEpoch.toString();
-          final success = await MomoService.makePayment(
-            email: email,
-            amount: (amount * 100).toInt(),
-            reference: reference,
-          );
-          if (success) {
-            context.read<TransactionsProvider>().addTransaction(
-              Transaction(
-                id: reference,
-                title: 'Money added',
-                amount: amount,
-                date: DateTime.now(),
-              ),
-            );
-            if (mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Payment successful!')),
-              );
-            }
-            context.go('/homepage');
-          } else {
-            if (mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Payment failed. Please try again.')),
-              );
-            }
-          }
-        },
+        onPressed: _handlePayment,
         child: const Text(
           'Continue',
           style: TextStyle(fontSize: 17, color: Colors.white, fontWeight: FontWeight.w600),
         ),
       ),
     );
+  }
+
+  Future<void> _handlePayment() async {
+    final amount = double.tryParse(_amountController.text) ?? 0;
+    if (amount <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter a valid amount.')),
+      );
+      return;
+    }
+
+    final reference = PaystackService.generateReference();
+    final email = FirebaseAuth.instance.currentUser?.email ?? 'customer@susuplus.com';
+    final amountInPesewas = (amount * 100).round();
+
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Not authenticated.')));
+        return;
+      }
+
+      await FirebaseFirestore.instance.collection('orders').doc(reference).set({
+        'reference': reference,
+        'uid': user.uid,
+        'email': email,
+        'amount': amountInPesewas,
+        'currency': 'GHS',
+        'status': 'pending',
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+
+      final authUrl = await PaystackService.initializeTransaction(
+        email: email,
+        amountInPesewas: amountInPesewas,
+        reference: reference,
+      );
+
+      if (!mounted) return;
+
+      if (authUrl == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Failed to initialize payment. Please try again.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
+
+      final controller = WebViewController()
+        ..setJavaScriptMode(JavaScriptMode.unrestricted)
+        ..loadRequest(Uri.parse(authUrl));
+
+      await Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => Scaffold(
+            appBar: AppBar(
+              backgroundColor: Colors.white,
+              elevation: 0,
+              title: const Text('Payment', style: TextStyle(color: Colors.black87)),
+              leading: IconButton(
+                icon: const Icon(Icons.close, color: Colors.black87),
+                onPressed: () => context.pop(),
+              ),
+            ),
+            body: WebViewWidget(controller: controller),
+          ),
+        ),
+      );
+
+      if (!mounted) return;
+
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) => _PaymentStatusDialog(
+          reference: reference,
+          amount: amount,
+        ),
+      );
+
+      final result = await PaystackService.verifyTransaction(reference: reference);
+      if (result != null && result['status'] == 'success') {
+        await FirebaseFirestore.instance.collection('orders').doc(reference).update({
+          'status': 'paid',
+          'paidAt': FieldValue.serverTimestamp(),
+        });
+      } else {
+        await FirebaseFirestore.instance.collection('orders').doc(reference).update({
+          'status': 'failed',
+        });
+      }
+    } on PaystackException catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.message), backgroundColor: Colors.red.shade600),
+        );
+      }
+    } catch (e, st) {
+      debugPrint('Payment error: $e\n$st');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+}
+
+class _PaymentStatusDialog extends StatefulWidget {
+  final String reference;
+  final double amount;
+  const _PaymentStatusDialog({required this.reference, required this.amount});
+
+  @override
+  State<_PaymentStatusDialog> createState() => _PaymentStatusDialogState();
+}
+
+class _PaymentStatusDialogState extends State<_PaymentStatusDialog> {
+  @override
+  Widget build(BuildContext context) {
+    return PopScope(
+      canPop: false,
+      child: AlertDialog(
+        content: StreamBuilder<DocumentSnapshot>(
+          stream: FirebaseFirestore.instance
+              .collection('orders')
+              .doc(widget.reference)
+              .snapshots(),
+          builder: (context, snapshot) {
+            final status = snapshot.data?['status'] as String?;
+
+            if (status == 'paid') {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (mounted) _onSuccess(context);
+              });
+              return _buildSuccess();
+            }
+
+            if (status == 'failed') {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (mounted) _onFailed(context);
+              });
+              return _buildFailed();
+            }
+
+            return _buildWaiting();
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildWaiting() {
+    return const SizedBox(
+      width: 260,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SizedBox(height: 20),
+          SizedBox(width: 48, height: 48, child: CircularProgressIndicator(strokeWidth: 3)),
+          SizedBox(height: 24),
+          Text(
+            'Processing payment...',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+          ),
+          SizedBox(height: 8),
+          Text(
+            'Please wait while we confirm your transaction.',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 13, color: Colors.black54),
+          ),
+          SizedBox(height: 12),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSuccess() {
+    return SizedBox(
+      width: 260,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const SizedBox(height: 12),
+          TweenAnimationBuilder<double>(
+            tween: Tween(begin: 0.0, end: 1.0),
+            duration: const Duration(milliseconds: 500),
+            curve: Curves.elasticOut,
+            builder: (_, scale, __) => Transform.scale(
+              scale: scale,
+              child: Container(
+                width: 72,
+                height: 72,
+                decoration: const BoxDecoration(
+                  color: Color(0xFF22C55E),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.check, color: Colors.white, size: 40),
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
+          const Text(
+            'Payment Successful!',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: Color(0xFF22C55E)),
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            'Your money has been added.',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 13, color: Colors.black54),
+          ),
+          const SizedBox(height: 16),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFailed() {
+    return SizedBox(
+      width: 260,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const SizedBox(height: 12),
+          Container(
+            width: 72,
+            height: 72,
+            decoration: const BoxDecoration(
+              color: Color(0xFFEF4444),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(Icons.close, color: Colors.white, size: 40),
+          ),
+          const SizedBox(height: 20),
+          const Text(
+            'Payment Failed',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: Color(0xFFEF4444)),
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            'Please try again.',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 13, color: Colors.black54),
+          ),
+          const SizedBox(height: 16),
+        ],
+      ),
+    );
+  }
+
+  void _onSuccess(BuildContext context) {
+    context.read<TransactionsProvider>().addTransaction(
+      Transaction(
+        id: widget.reference,
+        title: 'Money added',
+        amount: widget.amount,
+        date: DateTime.now(),
+      ),
+    );
+    Navigator.of(context).pop();
+    Navigator.of(context).pop();
+  }
+
+  void _onFailed(BuildContext context) {
+    Navigator.of(context).pop();
   }
 }
