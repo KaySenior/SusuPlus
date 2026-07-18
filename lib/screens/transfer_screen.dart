@@ -94,7 +94,7 @@ class _TransferScreenState extends State<TransferScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Container(
         decoration: BoxDecoration(
-          color: const Color(0xFFF0F4FF),
+          color: const Color(0xFFE8EDF5),
           borderRadius: BorderRadius.circular(10),
         ),
         child: Row(
@@ -108,10 +108,14 @@ class _TransferScreenState extends State<TransferScreen> {
                     color: _isAddMoney ? const Color(0xFF1E6FD9) : Colors.transparent,
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const Text(
+                  child: Text(
                     'Add Money',
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Colors.white),
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: _isAddMoney ? Colors.white : const Color(0xFF1E6FD9),
+                    ),
                   ),
                 ),
               ),
@@ -122,13 +126,17 @@ class _TransferScreenState extends State<TransferScreen> {
                 child: Container(
                   padding: const EdgeInsets.symmetric(vertical: 12),
                   decoration: BoxDecoration(
-                    color: !_isAddMoney ? const Color(0xFF1E6FD9).withValues(alpha: 0.4) : Colors.transparent,
+                    color: !_isAddMoney ? const Color(0xFF1E6FD9) : Colors.transparent,
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const Text(
+                  child: Text(
                     'Send Money',
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Colors.white),
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: !_isAddMoney ? Colors.white : const Color(0xFF1E6FD9),
+                    ),
                   ),
                 ),
               ),
@@ -621,10 +629,10 @@ class _PaymentStatusDialogState extends State<_PaymentStatusDialog> {
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: Color(0xFFEF4444)),
                 ),
                 const SizedBox(height: 8),
-                const Text(
-                  'Please try again.',
+                Text(
+                  widget.isDeposit ? 'Insufficient funds' : 'Please try again.',
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 13, color: Colors.black54),
+                  style: const TextStyle(fontSize: 13, color: Colors.black54),
                 ),
               ],
               const SizedBox(height: 16),
