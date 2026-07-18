@@ -521,10 +521,16 @@ class _TransferScreenState extends State<TransferScreen> {
 
       if (!mounted) return;
 
+      debugPrint('Transfer response: $transfer');
+
       String transferStatus = 'failed';
       String? transferCode;
+      String? transferError;
 
-      if (transfer != null) {
+      if (transfer == null) {
+        transferError = PaystackService.lastTransferError;
+        debugPrint('Transfer error: $transferError');
+      } else {
         transferStatus = transfer['status'] as String? ?? 'failed';
         transferCode = transfer['transfer_code'] as String?;
 
@@ -585,6 +591,10 @@ class _TransferScreenState extends State<TransferScreen> {
       }
 
       if (!mounted) return;
+
+      if (!success && transferError != null) {
+        _showError(transferError);
+      }
 
       await showDialog(
         context: context,

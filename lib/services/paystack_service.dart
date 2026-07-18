@@ -9,6 +9,7 @@ class PaystackService {
 
   static const String _secretKey = AppEnv.paystackSecretKey;
   static const String _publicKey = AppEnv.paystackPublicKey;
+  static String? lastTransferError;
 
   static String get publicKey => _publicKey;
 
@@ -70,12 +71,15 @@ class PaystackService {
         }),
       );
 
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        return data['data'] as Map<String, dynamic>?;
+      final body = jsonDecode(response.body);
+      if (response.statusCode == 200 && body['status'] == true) {
+        return body['data'] as Map<String, dynamic>?;
       }
+      lastTransferError = body['message'] as String? ?? 'Unknown error';
+      dev.log('Paystack initiate transfer failed: $lastTransferError');
       return null;
     } catch (e) {
+      lastTransferError = e.toString();
       dev.log('Paystack initiate transfer error: $e');
       return null;
     }
