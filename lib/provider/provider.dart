@@ -34,17 +34,28 @@ class TransactionsProvider extends ChangeNotifier {
 
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .collection('transactions')
-          .doc(tx.id)
-          .set({
-        'id': tx.id,
-        'title': tx.title,
-        'amount': tx.amount,
-        'date': tx.date.toIso8601String(),
-      });
+      final batch = FirebaseFirestore.instance.batch();
+
+      batch.set(
+        FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .collection('transactions')
+            .doc(tx.id),
+        {
+          'id': tx.id,
+          'title': tx.title,
+          'amount': tx.amount,
+          'date': tx.date.toIso8601String(),
+        },
+      );
+
+      batch.update(
+        FirebaseFirestore.instance.collection('users').doc(user.uid),
+        {'balance': _balance},
+      );
+
+      await batch.commit();
     }
   }
 
@@ -53,6 +64,11 @@ class TransactionsProvider extends ChangeNotifier {
     if (user == null) return;
 
     try {
+      final userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get();
+
       final snapshot = await FirebaseFirestore.instance
           .collection('users')
           .doc(user.uid)
@@ -70,7 +86,10 @@ class TransactionsProvider extends ChangeNotifier {
         );
       }).toList();
 
-      loadTransactions(txs);
+      final balance = (userDoc.data()?['balance'] as num?)?.toDouble() ?? txs.fold<double>(0.0, (total, tx) => total + tx.amount);
+      _balance = balance;
+      _transactions = txs;
+      notifyListeners();
     } catch (e) {
       debugPrint('fetchTransactions error: $e');
     }

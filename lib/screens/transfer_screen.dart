@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart' hide Transaction;
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:susu/provider/provider.dart';
@@ -398,11 +397,32 @@ class _TransferScreenState extends State<TransferScreen> {
       final result = await PaystackService.verifyTransaction(reference: reference);
       final success = result != null && result['status'] == 'success';
 
-      if (success) {
-        await FirebaseFirestore.instance.collection('orders').doc(reference).update({
+      if (!mounted) return;
+
+      final rootNav = Navigator.of(context, rootNavigator: true);
+      if (rootNav.canPop()) rootNav.pop();
+
+      if (result != null && success) {
+        final paidEmail = result['customer']?['email'] as String? ?? email;
+        final paidAmountPesewas = result['amount'] as int? ?? amountInPesewas;
+        final paidAmount = paidAmountPesewas / 100;
+
+        await FirebaseFirestore.instance.collection('orders').doc(reference).set({
+          'reference': reference,
+          'uid': user.uid,
+          'email': paidEmail,
+          'amount': paidAmountPesewas,
+          'currency': 'GHS',
           'status': 'paid',
           'paidAt': FieldValue.serverTimestamp(),
         });
+
+        if (!mounted) return;
+        if (context.mounted) {
+          context.read<TransactionsProvider>().addTransaction(
+                Transaction(id: reference, title: 'Money added', amount: paidAmount, date: DateTime.now()),
+              );
+        }
       } else {
         await FirebaseFirestore.instance.collection('orders').doc(reference).update({
           'status': 'failed',
@@ -411,26 +431,14 @@ class _TransferScreenState extends State<TransferScreen> {
 
       if (!mounted) return;
 
-      final rootNav = Navigator.of(context, rootNavigator: true);
-      if (rootNav.canPop()) rootNav.pop();
-
       await showDialog(
         context: context,
         barrierDismissible: false,
         builder: (_) => _PaymentStatusDialog(success: success, isDeposit: true),
       );
 
-      if (!mounted) return;
-
-      if (success) {
-        context.read<TransactionsProvider>().addTransaction(
-              Transaction(id: reference, title: 'Money added', amount: amount, date: DateTime.now()),
-            );
-      }
-
       setState(() => _loading = false);
       selectedPage.value = 0;
-      context.go('/homepage');
     } on PaystackException catch (e) {
       if (mounted) _showError(e.message);
     } catch (e, st) {
@@ -533,7 +541,6 @@ class _TransferScreenState extends State<TransferScreen> {
 
       setState(() => _loading = false);
       selectedPage.value = 0;
-      context.go('/homepage');
     } on PaystackException catch (e) {
       if (mounted) _showError(e.message);
     } catch (e, st) {
