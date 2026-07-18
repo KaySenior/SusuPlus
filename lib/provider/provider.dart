@@ -23,13 +23,15 @@ class TransactionsProvider extends ChangeNotifier {
 
   void loadTransactions(List<Transaction> txs) {
     _transactions = txs;
-    _balance = txs.fold(0.0, (total, tx) => total + tx.amount);
+    _balance = txs.fold(0.0, (total, tx) => total + (tx.status == 'completed' ? tx.amount : 0));
     notifyListeners();
   }
 
   Future<void> addTransaction(Transaction tx) async {
     _transactions = [..._transactions, tx];
-    _balance += tx.amount;
+    if (tx.status == 'completed') {
+      _balance += tx.amount;
+    }
     notifyListeners();
 
     final user = FirebaseAuth.instance.currentUser;
@@ -47,6 +49,7 @@ class TransactionsProvider extends ChangeNotifier {
           'title': tx.title,
           'amount': tx.amount,
           'date': tx.date.toIso8601String(),
+          'status': tx.status,
         },
       );
 
@@ -83,10 +86,11 @@ class TransactionsProvider extends ChangeNotifier {
           title: data['title'] as String,
           amount: (data['amount'] as num).toDouble(),
           date: DateTime.parse(data['date'] as String),
+          status: data['status'] as String? ?? 'completed',
         );
       }).toList();
 
-      final balance = (userDoc.data()?['balance'] as num?)?.toDouble() ?? txs.fold<double>(0.0, (total, tx) => total + tx.amount);
+      final balance = (userDoc.data()?['balance'] as num?)?.toDouble() ?? txs.fold<double>(0.0, (total, tx) => total + (tx.status == 'completed' ? tx.amount : 0));
       _balance = balance;
       _transactions = txs;
       notifyListeners();

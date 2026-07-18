@@ -74,7 +74,8 @@ class _TransactionScreenState extends State<TransactionScreen> {
               itemCount: items.length,
               itemBuilder: (context, i) {
                 final tx = items.reversed.toList()[i];
-                final isCredit = tx.amount > 0;
+                final isFailed = tx.status == 'failed';
+                final isCredit = tx.amount > 0 && !isFailed;
                 return Container(
                   margin: const EdgeInsets.symmetric(vertical: 6),
                   decoration: BoxDecoration(
@@ -88,14 +89,16 @@ class _TransactionScreenState extends State<TransactionScreen> {
                         width: 44,
                         height: 44,
                         decoration: BoxDecoration(
-                          color: isCredit
-                              ? const Color(0xFF22C55E).withValues(alpha: 0.1)
-                              : const Color(0xFFEF4444).withValues(alpha: 0.1),
+                          color: isFailed
+                              ? Colors.grey.shade100
+                              : isCredit
+                                  ? const Color(0xFF22C55E).withValues(alpha: 0.1)
+                                  : const Color(0xFFEF4444).withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Icon(
-                          isCredit ? PhosphorIcons.arrowDown : PhosphorIcons.arrowUp,
-                          color: Colors.black,
+                          isFailed ? PhosphorIcons.x : isCredit ? PhosphorIcons.arrowDown : PhosphorIcons.arrowUp,
+                          color: isFailed ? Colors.grey : Colors.black,
                           size: 22,
                         ),
                       ),
@@ -108,23 +111,40 @@ class _TransactionScreenState extends State<TransactionScreen> {
                                 style: const TextStyle(
                                     fontSize: 15, fontWeight: FontWeight.w500)),
                             const SizedBox(height: 2),
-                            Text(
-                              '${tx.date.day}/${tx.date.month}/${tx.date.year}',
-                              style: TextStyle(fontSize: 13, color: Colors.grey.shade500),
+                            Row(
+                              children: [
+                                Text(
+                                  '${tx.date.day}/${tx.date.month}/${tx.date.year}',
+                                  style: TextStyle(fontSize: 13, color: Colors.grey.shade500),
+                                ),
+                                if (isFailed) ...[
+                                  const SizedBox(width: 8),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFEF4444).withValues(alpha: 0.1),
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                    child: const Text('Failed',
+                                        style: TextStyle(fontSize: 11, color: Color(0xFFEF4444), fontWeight: FontWeight.w500)),
+                                  ),
+                                ],
+                              ],
                             ),
                           ],
                         ),
                       ),
-                      Text(
-                        isCredit
-                            ? '+₵${tx.amount.toStringAsFixed(2)}'
-                            : '-₵${tx.amount.toStringAsFixed(2)}',
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600,
-                          color: isCredit ? const Color(0xFF22C55E) : Colors.black87,
+                      if (!isFailed)
+                        Text(
+                          isCredit
+                              ? '+₵${tx.amount.toStringAsFixed(2)}'
+                              : '-₵${tx.amount.toStringAsFixed(2)}',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                            color: isCredit ? const Color(0xFF22C55E) : Colors.black87,
+                          ),
                         ),
-                      ),
                     ],
                   ),
                 );

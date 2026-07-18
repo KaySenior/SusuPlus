@@ -415,7 +415,7 @@ class _TransferScreenState extends State<TransferScreen> {
           'currency': 'GHS',
           'status': 'paid',
           'paidAt': FieldValue.serverTimestamp(),
-        });
+        }, SetOptions(merge: true));
 
         if (!mounted) return;
         if (context.mounted) {
@@ -424,9 +424,21 @@ class _TransferScreenState extends State<TransferScreen> {
               );
         }
       } else {
-        await FirebaseFirestore.instance.collection('orders').doc(reference).update({
+        await FirebaseFirestore.instance.collection('orders').doc(reference).set({
+          'reference': reference,
+          'uid': user.uid,
+          'email': email,
+          'amount': amountInPesewas,
+          'currency': 'GHS',
           'status': 'failed',
-        });
+        }, SetOptions(merge: true));
+
+        if (!mounted) return;
+        if (context.mounted) {
+          context.read<TransactionsProvider>().addTransaction(
+                Transaction(id: reference, title: 'Money added', amount: amount, date: DateTime.now(), status: 'failed'),
+              );
+        }
       }
 
       if (!mounted) return;
@@ -524,9 +536,29 @@ class _TransferScreenState extends State<TransferScreen> {
         });
 
         if (!mounted) return;
-        context.read<TransactionsProvider>().addTransaction(
-              Transaction(id: reference, title: 'Money sent to $phone', amount: -amount, date: DateTime.now()),
-            );
+        if (context.mounted) {
+          context.read<TransactionsProvider>().addTransaction(
+                Transaction(id: reference, title: 'Money sent to $phone', amount: -amount, date: DateTime.now()),
+              );
+        }
+      } else {
+        await FirebaseFirestore.instance.collection('transfers').doc(reference).set({
+          'reference': reference,
+          'uid': user.uid,
+          'email': email,
+          'amount': amountInPesewas,
+          'phone': phone,
+          'provider': _provider,
+          'status': 'failed',
+          'createdAt': FieldValue.serverTimestamp(),
+        });
+
+        if (!mounted) return;
+        if (context.mounted) {
+          context.read<TransactionsProvider>().addTransaction(
+                Transaction(id: reference, title: 'Money sent to $phone', amount: -amount, date: DateTime.now(), status: 'failed'),
+              );
+        }
       }
 
       if (!mounted) return;
