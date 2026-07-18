@@ -7,7 +7,6 @@ import 'package:webview_flutter/webview_flutter.dart';
 import 'package:susu/provider/provider.dart';
 import 'package:susu/models/transaction.dart';
 import 'package:susu/services/paystack_service.dart';
-import 'package:susu/widgets/custom_row.dart';
 import 'package:susu/core/notifier.dart';
 
 class TransferScreen extends StatefulWidget {

@@ -1,8 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 
-class NotificationSettingsScreen extends StatelessWidget {
+class NotificationSettingsScreen extends StatefulWidget {
   const NotificationSettingsScreen({super.key});
+
+  @override
+  State<NotificationSettingsScreen> createState() => _NotificationSettingsScreenState();
+}
+
+class _NotificationSettingsScreenState extends State<NotificationSettingsScreen> {
+  bool _push = true;
+  bool _email = false;
 
   @override
   Widget build(BuildContext context) {
@@ -28,15 +36,15 @@ class NotificationSettingsScreen extends StatelessWidget {
                 children: [
                   SwitchListTile(
                     title: const Text('Push notifications'),
-                    value: true,
-                    onChanged: (_) {},
+                    value: _push,
+                    onChanged: (v) => setState(() => _push = v),
                     secondary: const Icon(PhosphorIcons.bell, color: Colors.black54),
                   ),
                   const Divider(height: 1, indent: 56, endIndent: 16),
                   SwitchListTile(
                     title: const Text('Email notifications'),
-                    value: false,
-                    onChanged: (_) {},
+                    value: _email,
+                    onChanged: (v) => setState(() => _email = v),
                     secondary: const Icon(PhosphorIcons.envelope, color: Colors.black54),
                   ),
                 ],

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:susu/provider/provider.dart';
+import '../core/notifier.dart';
 
 class TransactionScreen extends StatefulWidget {
   const TransactionScreen({super.key});
@@ -57,7 +58,7 @@ class _TransactionScreenState extends State<TransactionScreen> {
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
                           elevation: 0,
                         ),
-                        onPressed: () => context.go('/transfer'),
+                        onPressed: () { selectedPage.value = 1; context.go('/homepage'); },
                         child: const Text(
                           'Make a transaction',
                           style: TextStyle(fontSize: 16, color: Colors.white),

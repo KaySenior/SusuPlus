@@ -31,12 +31,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFEEF2F9),
       appBar: AppBar(
-      backgroundColor: const Color(0xFFEEF2F9),
+        backgroundColor: const Color(0xFFEEF2F9),
         elevation: 0,
         automaticallyImplyLeading: false,
         title: const Text(
           'Profile',
-          style: TextStyle(fontSize: 18, color: Colors.black87, fontWeight: FontWeight.w500),
+          style: TextStyle(
+              fontSize: 18, color: Colors.black87, fontWeight: FontWeight.w500),
         ),
         centerTitle: true,
         actions: const [],
@@ -44,86 +45,120 @@ class _ProfileScreenState extends State<ProfileScreen> {
       body: Column(
         children: [
           const SizedBox(height: 8),
-          ListTile(
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-            leading: Hero(
-              tag: 'profileAvatar',
-              child: CircleAvatar(
-                radius: 28,
-                backgroundColor: Colors.grey[200],
-                backgroundImage: AuthService.getCurrentUser()?.photoURL != null
-                    ? NetworkImage(AuthService.getCurrentUser()!.photoURL!)
-                    : null,
-                child: AuthService.getCurrentUser()?.photoURL == null
-                    ? const Icon(PhosphorIcons.userCircle, size: 32, color: Colors.grey)
-                    : null,
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: ListTile(
+              contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+              leading: Hero(
+                tag: 'profileAvatar',
+                child: CircleAvatar(
+                  radius: 28,
+                  backgroundColor: Colors.grey[200],
+                  backgroundImage: AuthService.getCurrentUser()?.photoURL !=
+                          null
+                      ? NetworkImage(AuthService.getCurrentUser()!.photoURL!)
+                      : null,
+                  child: AuthService.getCurrentUser()?.photoURL == null
+                      ? const Icon(PhosphorIcons.userCircle,
+                          size: 32, color: Colors.grey)
+                      : null,
+                ),
+              ),
+              title: Text(
+                _displayName(),
+                style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black87),
               ),
             ),
-            title: Text(
-              _displayName(),
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.black87),
-            ),
-            subtitle: const Text(
-              'Show profile',
-              style: TextStyle(fontSize: 14, color: Colors.blue),
-            ),
           ),
-          const Divider(height: 32, indent: 16, endIndent: 16),
           const Padding(
             padding: EdgeInsets.only(left: 16),
             child: Align(
               alignment: Alignment.centerLeft,
               child: Text(
                 'Accounts',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400, color: Colors.grey),
+                style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w400,
+                    color: Colors.grey),
               ),
             ),
           ),
           const SizedBox(height: 8),
           Expanded(
-            child: ListView(
-              children: [
-                Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Material(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    child: Column(
-                      children: [
-                        _settingsTile(icon: PhosphorIcons.userCircle, label: 'Your profile', screen: const ProfileDetailScreen()),
-                        _settingsTile(icon: PhosphorIcons.shieldCheck, label: 'Account verification status', screen: const VerificationStatusScreen()),
-                      ],
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Material(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      child: Column(
+                        children: [
+                          _settingsTile(
+                              icon: PhosphorIcons.userCircle,
+                              label: 'Your profile',
+                              screen: const ProfileDetailScreen()),
+                          _settingsTile(
+                              icon: PhosphorIcons.shieldCheck,
+                              label: 'Account verification status',
+                              screen: const VerificationStatusScreen()),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 12),
-                const Padding(
-                  padding: EdgeInsets.only(left: 16),
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      'Security',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400, color: Colors.grey),
+                  const SizedBox(height: 12),
+                  const Padding(
+                    padding: EdgeInsets.only(left: 16),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Security',
+                        style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w400,
+                            color: Colors.grey),
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 8),
-                Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Material(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    child: Column(
-                      children: [
-                        _settingsTile(icon: PhosphorIcons.bell, label: 'Notification', screen: const NotificationSettingsScreen()),
-                        _settingsTile(icon: PhosphorIcons.lock, label: 'Change password', screen: const ChangePasswordScreen()),
-                        _settingsTile(icon: PhosphorIcons.trash, label: 'Delete account', screen: const DeleteAccountScreen()),
-                        _settingsTile(icon: PhosphorIcons.arrowsLeftRight, label: 'Transaction limits', screen: const TransactionLimitsScreen()),
-                      ],
+                  const SizedBox(height: 8),
+                  Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Material(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      child: Column(
+                        children: [
+                          _settingsTile(
+                              icon: PhosphorIcons.bell,
+                              label: 'Notification',
+                              screen: const NotificationSettingsScreen()),
+                          _settingsTile(
+                              icon: PhosphorIcons.lock,
+                              label: 'Change password',
+                              screen: const ChangePasswordScreen()),
+                          _settingsTile(
+                              icon: PhosphorIcons.trash,
+                              label: 'Delete account',
+                              screen: const DeleteAccountScreen()),
+                          _settingsTile(
+                              icon: PhosphorIcons.arrowsLeftRight,
+                              label: 'Transaction limits',
+                              screen: const TransactionLimitsScreen()),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
           Padding(
@@ -144,9 +179,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _settingsTile({required IconData icon, required String label, required Widget screen}) {
+  Widget _settingsTile(
+      {required IconData icon, required String label, required Widget screen}) {
     return ListTile(
-      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => screen)),
+      onTap: () =>
+          Navigator.push(context, MaterialPageRoute(builder: (_) => screen)),
       leading: Icon(icon, size: 24, color: Colors.black54),
       title: Text(
         label,
