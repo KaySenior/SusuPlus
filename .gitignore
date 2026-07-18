@@ -56,3 +56,5 @@ ios/Runner/GoogleService-Info.plist
 /gradle/
 /.gradle/
 local.properties
+susuplus_key.json
+*.json.key
