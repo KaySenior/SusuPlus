@@ -34,13 +34,16 @@ class ProfileDetailScreen extends StatelessWidget {
                 padding: const EdgeInsets.all(20),
                 child: Row(
                   children: [
-                    CircleAvatar(
-                      radius: 32,
-                      backgroundColor: Colors.grey[200],
-                      backgroundImage: user?.photoURL != null ? NetworkImage(user!.photoURL!) : null,
-                      child: user?.photoURL == null
-                          ? const Icon(PhosphorIcons.userCircle, size: 36, color: Colors.grey)
-                          : null,
+                    Hero(
+                      tag: 'profileAvatar',
+                      child: CircleAvatar(
+                        radius: 32,
+                        backgroundColor: Colors.grey[200],
+                        backgroundImage: user?.photoURL != null ? NetworkImage(user!.photoURL!) : null,
+                        child: user?.photoURL == null
+                            ? const Icon(PhosphorIcons.userCircle, size: 36, color: Colors.grey)
+                            : null,
+                      ),
                     ),
                     const SizedBox(width: 16),
                     Expanded(

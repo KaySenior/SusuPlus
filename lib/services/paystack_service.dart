@@ -7,14 +7,79 @@ class PaystackService {
   PaystackService._();
 
   static const String _secretKey =
-      'sk_test_872a8081e9d415c1e1325734749b63f49e42b7a4';
+      'sk_live_REPLACED';
   static const String _publicKey =
-      'pk_test_806e08f60c5e1264f1fff213aae6caeacb19a5ce';
+      'pk_live_77d1360609ce17d3a199acdf43ffcd8e35605ef8';
 
   static String get publicKey => _publicKey;
 
   static String generateReference() {
     return 'susu_${const Uuid().v4().replaceAll('-', '')}';
+  }
+
+  static Future<Map<String, dynamic>?> createTransferRecipient({
+    required String name,
+    required String accountNumber,
+    required String bankCode,
+  }) async {
+    try {
+      final response = await http.post(
+        Uri.parse('https://api.paystack.co/transferrecipient'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $_secretKey',
+        },
+        body: jsonEncode({
+          'type': 'mobile_money',
+          'name': name,
+          'account_number': accountNumber,
+          'bank_code': bankCode,
+          'currency': 'GHS',
+        }),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = jsonDecode(response.body);
+        return data['data'] as Map<String, dynamic>?;
+      }
+      return null;
+    } catch (e) {
+      dev.log('Paystack create recipient error: $e');
+      return null;
+    }
+  }
+
+  static Future<Map<String, dynamic>?> initiateTransfer({
+    required int amountInPesewas,
+    required String recipientCode,
+    required String reason,
+    required String reference,
+  }) async {
+    try {
+      final response = await http.post(
+        Uri.parse('https://api.paystack.co/transfer'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $_secretKey',
+        },
+        body: jsonEncode({
+          'source': 'balance',
+          'amount': amountInPesewas,
+          'recipient': recipientCode,
+          'reason': reason,
+          'reference': reference,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return data['data'] as Map<String, dynamic>?;
+      }
+      return null;
+    } catch (e) {
+      dev.log('Paystack initiate transfer error: $e');
+      return null;
+    }
   }
 
   static Future<Map<String, dynamic>?> verifyTransaction({

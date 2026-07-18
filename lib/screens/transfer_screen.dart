@@ -18,57 +18,40 @@ class TransferScreen extends StatefulWidget {
 }
 
 class _TransferScreenState extends State<TransferScreen> {
-  bool _recurring = false;
-  String _frequency = 'Monthly';
-  final _amountController = TextEditingController(text: '1.00');
-  final _toController = TextEditingController();
-  final _fromController = TextEditingController();
+  bool _isAddMoney = true;
 
-  static const _frequencies = ['Daily', 'Weekly', 'Monthly', 'Yearly'];
+  final _amountController = TextEditingController();
+  final _phoneController = TextEditingController();
+  String _provider = 'MTN';
+  bool _loading = false;
 
-  static const _months = [
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-    'July',
-    'August',
-    'September',
-    'October',
-    'November',
-    'December'
-  ];
-
-  String get _date {
-    final now = DateTime.now();
-    return '${_months[now.month - 1]} ${now.day}, ${now.year}';
-  }
+  static const _providers = ['MTN', 'Vodafone', 'AirtelTigo'];
+  static const _providerCodes = {
+    'MTN': 'MTN',
+    'Vodafone': 'VOD',
+    'AirtelTigo': 'TGO',
+  };
 
   @override
   void dispose() {
     _amountController.dispose();
-    _toController.dispose();
-    _fromController.dispose();
+    _phoneController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final balance = context.watch<TransactionsProvider>().balance;
+
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7FA),
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black87, size: 24),
-          onPressed: () => context.go('/homepage'),
-        ),
+        automaticallyImplyLeading: false,
         title: const Text(
           'Transfer',
-          style: TextStyle(
-              fontSize: 18, color: Colors.black87, fontWeight: FontWeight.w600),
+          style: TextStyle(fontSize: 18, color: Colors.black87, fontWeight: FontWeight.w600),
         ),
         centerTitle: true,
       ),
@@ -77,26 +60,18 @@ class _TransferScreenState extends State<TransferScreen> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             const SizedBox(height: 20),
-            _section(
-              child: _amountField(),
-            ),
+            _modeToggle(),
+            const SizedBox(height: 16),
+            _section(child: _amountField()),
             const SizedBox(height: 12),
-            _section(
-              child: _recurringRow(),
-            ),
-            const SizedBox(height: 12),
-            _section(
-              child: Column(
-                children: [
-                  _toRow(),
-                  if (_transferTo == 'number')
-                    const Divider(height: 1, indent: 0),
-                  _fromRow(),
-                  const Divider(height: 1, indent: 0),
-                  _dateRow(),
-                ],
-              ),
-            ),
+            if (!_isAddMoney) ...[
+              _section(child: _balanceRow(balance)),
+              const SizedBox(height: 12),
+              _section(child: _phoneField()),
+              const SizedBox(height: 12),
+              _section(child: _providerField()),
+              const SizedBox(height: 12),
+            ],
             const SizedBox(height: 24),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -105,9 +80,59 @@ class _TransferScreenState extends State<TransferScreen> {
             const SizedBox(height: 24),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: _continueButton(),
+              child: _actionButton(),
             ),
             const SizedBox(height: 32),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _modeToggle() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Container(
+        decoration: BoxDecoration(
+          color: const Color(0xFFF0F4FF),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: GestureDetector(
+                onTap: () => setState(() => _isAddMoney = true),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  decoration: BoxDecoration(
+                    color: _isAddMoney ? const Color(0xFF1E6FD9) : Colors.transparent,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Text(
+                    'Add Money',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Colors.white),
+                  ),
+                ),
+              ),
+            ),
+            Expanded(
+              child: GestureDetector(
+                onTap: () => setState(() => _isAddMoney = false),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  decoration: BoxDecoration(
+                    color: !_isAddMoney ? const Color(0xFF1E6FD9).withValues(alpha: 0.4) : Colors.transparent,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Text(
+                    'Send Money',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Colors.white),
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
       ),
@@ -142,10 +167,7 @@ class _TransferScreenState extends State<TransferScreen> {
         children: [
           const Text(
             'Amount',
-            style: TextStyle(
-                fontSize: 14,
-                color: Colors.black54,
-                fontWeight: FontWeight.w500),
+            style: TextStyle(fontSize: 14, color: Colors.black54, fontWeight: FontWeight.w500),
           ),
           const SizedBox(height: 8),
           Container(
@@ -160,22 +182,15 @@ class _TransferScreenState extends State<TransferScreen> {
                 child: TextField(
                   controller: _amountController,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
-                      fontSize: 32,
-                      color: Colors.black87,
-                      fontWeight: FontWeight.w600),
+                  style: const TextStyle(fontSize: 32, color: Colors.black87, fontWeight: FontWeight.w600),
                   decoration: InputDecoration(
                     border: InputBorder.none,
                     hintText: '₵0.00',
-                    hintStyle: TextStyle(
-                        fontSize: 28,
-                        color: Colors.black.withValues(alpha: 0.15),
-                        fontWeight: FontWeight.w600),
+                    hintStyle: TextStyle(fontSize: 28, color: Colors.black.withValues(alpha: 0.15), fontWeight: FontWeight.w600),
                     isDense: true,
                     contentPadding: EdgeInsets.zero,
                   ),
-                  keyboardType:
-                      const TextInputType.numberWithOptions(decimal: true),
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
                 ),
               ),
             ),
@@ -185,201 +200,72 @@ class _TransferScreenState extends State<TransferScreen> {
     );
   }
 
-  Widget _recurringRow() {
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 4),
-          child: CustomRow(
-            label: 'Recurring',
-            trailing: Switch(
-              value: _recurring,
-              activeThumbColor: const Color(0xFF1E6FD9),
-              activeTrackColor: const Color(0xFF1E6FD9).withValues(alpha: 0.4),
-              onChanged: (v) => setState(() => _recurring = v),
-            ),
-          ),
-        ),
-        if (_recurring) ...[
-          const Divider(height: 1, indent: 0),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 12),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text('Frequency',
-                    style: TextStyle(fontSize: 16, color: Colors.black87)),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: const Color(0xFFE0E0E0)),
-                  ),
-                  child: DropdownButton<String>(
-                    value: _frequency,
-                    underline: const SizedBox(),
-                    items: _frequencies
-                        .map((f) => DropdownMenuItem(
-                              value: f,
-                              child:
-                                  Text(f, style: const TextStyle(fontSize: 14)),
-                            ))
-                        .toList(),
-                    onChanged: (v) {
-                      if (v != null) setState(() => _frequency = v);
-                    },
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ],
-    );
-  }
-
-  Widget _accountField(
-      {required String label, required TextEditingController controller}) {
-    return CustomRow(
-      label: label,
-      trailing: SizedBox(
-        width: 200,
-        height: 36,
-        child: TextField(
-          controller: controller,
-          keyboardType: TextInputType.number,
-          decoration: InputDecoration(
-            hintText: 'Enter number',
-            hintStyle: const TextStyle(fontSize: 13, color: Colors.black38),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
-            ),
-            contentPadding:
-                const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
-          ),
-          style: const TextStyle(fontSize: 14),
-        ),
-      ),
-    );
-  }
-
-  String _transferTo = 'number';
-
-  Widget _toRow() {
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 12),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text('Transfer to',
-                  style: TextStyle(fontSize: 16, color: Colors.black87)),
-              Container(
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF0F4FF),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Row(
-                  children: [
-                    GestureDetector(
-                      onTap: () => setState(() => _transferTo = 'number'),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 14, vertical: 6),
-                        decoration: BoxDecoration(
-                          color: _transferTo == 'number'
-                              ? const Color(0xFF1E6FD9)
-                              : Colors.transparent,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Text(
-                          'Number',
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w500,
-                            color: _transferTo == 'number'
-                                ? Colors.white
-                                : Colors.black54,
-                          ),
-                        ),
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () => setState(() => _transferTo = 'account'),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 14, vertical: 6),
-                        decoration: BoxDecoration(
-                          color: _transferTo == 'account'
-                              ? const Color(0xFF1E6FD9)
-                              : Colors.transparent,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Text(
-                          'Your account',
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w500,
-                            color: _transferTo == 'account'
-                                ? Colors.white
-                                : Colors.black54,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-        if (_transferTo == 'number')
-          Padding(
-            padding: const EdgeInsets.only(bottom: 12),
-            child: TextField(
-              controller: _toController,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                hintText: 'Enter phone number',
-                hintStyle: const TextStyle(fontSize: 14, color: Colors.black38),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
-                ),
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-              ),
-              style: const TextStyle(fontSize: 15),
-            ),
-          ),
-      ],
-    );
-  }
-
-  Widget _fromRow() =>
-      _accountField(label: 'Transfer from', controller: _fromController);
-
-  Widget _dateRow() {
-    return CustomRow(
-      label: 'Date',
-      trailing: Row(
-        mainAxisSize: MainAxisSize.min,
+  Widget _balanceRow(double balance) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 16),
+      child: Row(
         children: [
+          const Text('Available Balance', style: TextStyle(fontSize: 15, color: Colors.black87)),
+          const Spacer(),
           Text(
-            _date,
-            style: const TextStyle(fontSize: 16, color: Colors.black87),
+            'GH¢${balance.toStringAsFixed(2)}',
+            style: TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+              color: balance > 0 ? const Color(0xFF22C55E) : Colors.black54,
+            ),
           ),
-          const Icon(Icons.keyboard_arrow_down, color: Colors.black54),
+        ],
+      ),
+    );
+  }
+
+  Widget _phoneField() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 16),
+      child: TextField(
+        controller: _phoneController,
+        keyboardType: TextInputType.phone,
+        decoration: InputDecoration(
+          labelText: 'Destination Phone Number',
+          hintText: '0555555555',
+          labelStyle: const TextStyle(color: Colors.grey, fontSize: 14),
+          hintStyle: TextStyle(color: Colors.grey.shade400),
+          floatingLabelBehavior: FloatingLabelBehavior.always,
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: Color(0xFF1E6FD9), width: 2),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _providerField() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          const Text('Provider', style: TextStyle(fontSize: 15, color: Colors.black87)),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: const Color(0xFFE0E0E0)),
+            ),
+            child: DropdownButton<String>(
+              value: _provider,
+              underline: const SizedBox(),
+              items: _providers
+                  .map((p) => DropdownMenuItem(value: p, child: Text(p, style: const TextStyle(fontSize: 14))))
+                  .toList(),
+              onChanged: (v) {
+                if (v != null) setState(() => _provider = v);
+              },
+            ),
+          ),
         ],
       ),
     );
@@ -402,47 +288,51 @@ class _TransferScreenState extends State<TransferScreen> {
     );
   }
 
-  Widget _continueButton() {
+  Widget _actionButton() {
     return SizedBox(
       height: 52,
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xFF1E6FD9),
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           elevation: 0,
         ),
-        onPressed: _handlePayment,
-        child: const Text(
-          'Continue',
-          style: TextStyle(
-              fontSize: 17, color: Colors.white, fontWeight: FontWeight.w600),
-        ),
+        onPressed: _loading ? null : _handleAction,
+        child: _loading
+            ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+            : Text(
+                _isAddMoney ? 'Add Money' : 'Send Money',
+                style: const TextStyle(fontSize: 17, color: Colors.white, fontWeight: FontWeight.w600),
+              ),
       ),
     );
   }
 
-  Future<void> _handlePayment() async {
+  Future<void> _handleAction() async {
+    if (_isAddMoney) {
+      await _handleAddMoney();
+    } else {
+      await _handleSendMoney();
+    }
+  }
+
+  Future<void> _handleAddMoney() async {
     final amount = double.tryParse(_amountController.text) ?? 0;
     if (amount <= 0) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter a valid amount.')),
-      );
+      _showError('Please enter a valid amount.');
       return;
     }
 
     final reference = PaystackService.generateReference();
-    final email =
-        FirebaseAuth.instance.currentUser?.email ?? 'customer@susuplus.com';
+    final email = FirebaseAuth.instance.currentUser?.email ?? 'customer@susuplus.com';
     final amountInPesewas = (amount * 100).round();
+
+    setState(() => _loading = true);
 
     try {
       final user = FirebaseAuth.instance.currentUser;
       if (user == null) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Not authenticated.')));
-        }
+        if (mounted) _showError('Not authenticated.');
         return;
       }
 
@@ -465,12 +355,7 @@ class _TransferScreenState extends State<TransferScreen> {
       if (!mounted) return;
 
       if (authUrl == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Failed to initialize payment. Please try again.'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        _showError('Failed to initialize payment. Please try again.');
         return;
       }
 
@@ -480,15 +365,14 @@ class _TransferScreenState extends State<TransferScreen> {
 
       await Navigator.of(context).push(
         MaterialPageRoute(
-          builder: (_) => Scaffold(
+          builder: (ctx) => Scaffold(
             appBar: AppBar(
               backgroundColor: Colors.white,
               elevation: 0,
-              title: const Text('Payment',
-                  style: TextStyle(color: Colors.black87)),
+              title: const Text('Payment', style: TextStyle(color: Colors.black87)),
               leading: IconButton(
                 icon: const Icon(Icons.close, color: Colors.black87),
-                onPressed: () => context.pop(),
+                onPressed: () => Navigator.of(ctx).pop(),
               ),
             ),
             body: WebViewWidget(controller: controller),
@@ -504,76 +388,166 @@ class _TransferScreenState extends State<TransferScreen> {
         builder: (_) => const Center(child: CircularProgressIndicator()),
       );
 
-      final result =
-          await PaystackService.verifyTransaction(reference: reference);
+      final result = await PaystackService.verifyTransaction(reference: reference);
       final success = result != null && result['status'] == 'success';
 
       if (success) {
-        await FirebaseFirestore.instance
-            .collection('orders')
-            .doc(reference)
-            .update({
+        await FirebaseFirestore.instance.collection('orders').doc(reference).update({
           'status': 'paid',
           'paidAt': FieldValue.serverTimestamp(),
         });
       } else {
-        await FirebaseFirestore.instance
-            .collection('orders')
-            .doc(reference)
-            .update({
+        await FirebaseFirestore.instance.collection('orders').doc(reference).update({
           'status': 'failed',
         });
       }
 
       if (!mounted) return;
 
-      if (mounted) Navigator.of(context, rootNavigator: true).pop();
+      final rootNav = Navigator.of(context, rootNavigator: true);
+      if (rootNav.canPop()) rootNav.pop();
 
       await showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (_) => _PaymentStatusDialog(success: success),
+        builder: (_) => _PaymentStatusDialog(success: success, isDeposit: true),
       );
 
       if (!mounted) return;
 
       if (success) {
         context.read<TransactionsProvider>().addTransaction(
-              Transaction(
-                id: reference,
-                title: 'Money added',
-                amount: amount,
-                date: DateTime.now(),
-              ),
+              Transaction(id: reference, title: 'Money added', amount: amount, date: DateTime.now()),
             );
       }
 
+      setState(() => _loading = false);
       selectedPage.value = 0;
       context.go('/homepage');
     } on PaystackException catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text(e.message), backgroundColor: Colors.red.shade600),
-        );
-      }
+      if (mounted) _showError(e.message);
     } catch (e, st) {
       debugPrint('Payment error: $e\n$st');
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
+      if (mounted) _showError('Error: $e');
+    } finally {
+      if (mounted) setState(() => _loading = false);
     }
+  }
+
+  Future<void> _handleSendMoney() async {
+    final amount = double.tryParse(_amountController.text) ?? 0;
+    final phone = _phoneController.text.trim();
+    final providerCode = _providerCodes[_provider] ?? 'MTN';
+
+    if (amount <= 0) {
+      _showError('Please enter a valid amount.');
+      return;
+    }
+
+    if (phone.isEmpty) {
+      _showError('Please enter a destination phone number.');
+      return;
+    }
+
+    final balance = context.read<TransactionsProvider>().balance;
+    if (amount > balance) {
+      _showError('Insufficient balance. You have GH¢${balance.toStringAsFixed(2)}.');
+      return;
+    }
+
+    final reference = PaystackService.generateReference();
+    final email = FirebaseAuth.instance.currentUser?.email ?? 'customer@susuplus.com';
+    final amountInPesewas = (amount * 100).round();
+
+    setState(() => _loading = true);
+
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        if (mounted) _showError('Not authenticated.');
+        return;
+      }
+
+      final recipient = await PaystackService.createTransferRecipient(
+        name: user.displayName ?? email,
+        accountNumber: phone,
+        bankCode: providerCode,
+      );
+
+      if (recipient == null) {
+        if (mounted) _showError('Failed to create recipient. Please try again.');
+        return;
+      }
+
+      final recipientCode = recipient['recipient_code'] as String?;
+      if (recipientCode == null) {
+        if (mounted) _showError('Invalid recipient response.');
+        return;
+      }
+
+      final transfer = await PaystackService.initiateTransfer(
+        amountInPesewas: amountInPesewas,
+        recipientCode: recipientCode,
+        reason: 'SusuPlus payout',
+        reference: reference,
+      );
+
+      if (!mounted) return;
+
+      final success = transfer != null && transfer['status'] == 'success';
+
+      if (success) {
+        await FirebaseFirestore.instance.collection('transfers').doc(reference).set({
+          'reference': reference,
+          'uid': user.uid,
+          'email': email,
+          'amount': amountInPesewas,
+          'phone': phone,
+          'provider': _provider,
+          'status': 'sent',
+          'createdAt': FieldValue.serverTimestamp(),
+        });
+
+        if (!mounted) return;
+        context.read<TransactionsProvider>().addTransaction(
+              Transaction(id: reference, title: 'Money sent to $phone', amount: -amount, date: DateTime.now()),
+            );
+      }
+
+      if (!mounted) return;
+
+      await showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) => _PaymentStatusDialog(success: success, isDeposit: false),
+      );
+
+      if (!mounted) return;
+
+      setState(() => _loading = false);
+      selectedPage.value = 0;
+      context.go('/homepage');
+    } on PaystackException catch (e) {
+      if (mounted) _showError(e.message);
+    } catch (e, st) {
+      debugPrint('Transfer error: $e\n$st');
+      if (mounted) _showError('Error: $e');
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  void _showError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message), backgroundColor: Colors.red.shade600),
+    );
   }
 }
 
 class _PaymentStatusDialog extends StatefulWidget {
   final bool success;
-  const _PaymentStatusDialog({required this.success});
+  final bool isDeposit;
+  const _PaymentStatusDialog({required this.success, required this.isDeposit});
 
   @override
   State<_PaymentStatusDialog> createState() => _PaymentStatusDialogState();
@@ -584,7 +558,10 @@ class _PaymentStatusDialogState extends State<_PaymentStatusDialog> {
   void initState() {
     super.initState();
     Future.delayed(const Duration(seconds: 2), () {
-      if (mounted) Navigator.of(context, rootNavigator: true).pop();
+      if (mounted) {
+        final navigator = Navigator.of(context, rootNavigator: true);
+        if (navigator.canPop()) navigator.pop();
+      }
     });
   }
 
@@ -613,24 +590,20 @@ class _PaymentStatusDialogState extends State<_PaymentStatusDialog> {
                         color: Color(0xFF22C55E),
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(Icons.check,
-                          color: Colors.white, size: 40),
+                      child: const Icon(Icons.check, color: Colors.white, size: 40),
                     ),
                   ),
                 ),
                 const SizedBox(height: 20),
-                const Text(
-                  'Payment Successful!',
-                  style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                      color: Color(0xFF22C55E)),
+                Text(
+                  widget.isDeposit ? 'Money Added!' : 'Money Sent!',
+                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: Color(0xFF22C55E)),
                 ),
                 const SizedBox(height: 8),
-                const Text(
-                  'Your money has been added.',
+                Text(
+                  widget.isDeposit ? 'Your balance has been updated.' : 'Sent to mobile money.',
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 13, color: Colors.black54),
+                  style: const TextStyle(fontSize: 13, color: Colors.black54),
                 ),
               ] else ...[
                 Container(
@@ -644,11 +617,8 @@ class _PaymentStatusDialogState extends State<_PaymentStatusDialog> {
                 ),
                 const SizedBox(height: 20),
                 const Text(
-                  'Payment Failed',
-                  style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                      color: Color(0xFFEF4444)),
+                  'Transaction Failed',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: Color(0xFFEF4444)),
                 ),
                 const SizedBox(height: 8),
                 const Text(

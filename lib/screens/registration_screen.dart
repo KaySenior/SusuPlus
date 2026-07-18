@@ -15,6 +15,7 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  bool _loading = false;
 
   @override
   void dispose() {
@@ -24,6 +25,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void login() async {
+    if (_loading) return;
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
 
@@ -33,6 +35,8 @@ class _LoginScreenState extends State<LoginScreen> {
       );
       return;
     }
+
+    setState(() => _loading = true);
 
     try {
       await authService.signIn(email: email, password: password);
@@ -71,6 +75,8 @@ class _LoginScreenState extends State<LoginScreen> {
           const SnackBar(content: Text('Something went wrong. Please try again.')),
         );
       }
+    } finally {
+      if (mounted) setState(() => _loading = false);
     }
   }
 
@@ -93,7 +99,7 @@ class _LoginScreenState extends State<LoginScreen> {
         child: Column(
           children: [
             const SizedBox(height: 32),
-            Image.asset('assets/images/atom.png', height: 72),
+            Hero(tag: 'appLogo', child: Image.asset('assets/images/atom.png', height: 72)),
             const SizedBox(height: 24),
             const Text(
               'Enter your password',
@@ -144,8 +150,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   elevation: 0,
                 ),
-                onPressed: login,
-                child: const Text('Continue', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                onPressed: _loading ? null : login,
+                child: _loading
+                    ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                    : const Text('Continue', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
               ),
             ),
             const SizedBox(height: 16),
@@ -159,6 +167,27 @@ class _LoginScreenState extends State<LoginScreen> {
                   fontSize: 15,
                 ),
               ),
+            ),
+            const SizedBox(height: 8),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text(
+                  "Don't have an account? ",
+                  style: TextStyle(color: Colors.black54, fontSize: 14),
+                ),
+                GestureDetector(
+                  onTap: () => context.go('/registration'),
+                  child: const Text(
+                    'Sign up',
+                    style: TextStyle(
+                      color: Color(0xFF1E6FD9),
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
         ),

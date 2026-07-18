@@ -46,10 +46,39 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
       if (!mounted) return;
 
-      await _showCheckout(authUrl);
+      final controller = WebViewController()
+        ..setJavaScriptMode(JavaScriptMode.unrestricted)
+        ..loadRequest(Uri.parse(authUrl));
+
+      await Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (ctx) => Scaffold(
+            appBar: AppBar(
+              backgroundColor: Colors.white,
+              elevation: 0,
+              title: const Text('Payment', style: TextStyle(color: Colors.black87)),
+              leading: IconButton(
+                icon: const Icon(Icons.close, color: Colors.black87),
+                onPressed: () => Navigator.of(ctx).pop(),
+              ),
+            ),
+            body: WebViewWidget(controller: controller),
+          ),
+        ),
+      );
+
+      if (!mounted) return;
+
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) => const Center(child: CircularProgressIndicator()),
+      );
 
       final result = await PaystackService.verifyTransaction(reference: _reference);
-      if (result != null && result['status'] == 'success') {
+      final success = result != null && result['status'] == 'success';
+
+      if (success) {
         await FirebaseFirestore.instance.collection('orders').doc(_reference).update({
           'status': 'paid',
           'paidAt': FieldValue.serverTimestamp(),
@@ -59,6 +88,32 @@ class _PaymentScreenState extends State<PaymentScreen> {
           'status': 'failed',
         });
       }
+
+      if (!mounted) return;
+
+      final rootNav = Navigator.of(context, rootNavigator: true);
+      if (rootNav.canPop()) rootNav.pop();
+
+      await showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) => _PaymentStatusDialog(success: success),
+      );
+
+      if (!mounted) return;
+
+      if (success) {
+        context.read<TransactionsProvider>().addTransaction(
+          Transaction(
+            id: _reference,
+            title: 'Money added',
+            amount: widget.amount,
+            date: DateTime.now(),
+          ),
+        );
+      }
+
+      context.go('/homepage');
     } on PaystackException catch (e) {
       if (mounted) _showError(e.message);
     } catch (e) {
@@ -75,40 +130,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
       'status': 'pending',
       'createdAt': FieldValue.serverTimestamp(),
     });
-  }
-
-  Future<void> _showCheckout(String authUrl) async {
-    final controller = WebViewController()
-      ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..loadRequest(Uri.parse(authUrl));
-
-    await Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => Scaffold(
-          appBar: AppBar(
-            backgroundColor: Colors.white,
-            elevation: 0,
-            title: const Text('Payment', style: TextStyle(color: Colors.black87)),
-            leading: IconButton(
-              icon: const Icon(Icons.close, color: Colors.black87),
-              onPressed: () => context.pop(),
-            ),
-          ),
-          body: WebViewWidget(controller: controller),
-        ),
-      ),
-    );
-
-    if (!mounted) return;
-    _showWaitingDialog();
-  }
-
-  void _showWaitingDialog() {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) => _PaymentStatusDialog(reference: _reference),
-    );
   }
 
   void _showError(String message) {
@@ -178,8 +199,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
 }
 
 class _PaymentStatusDialog extends StatefulWidget {
-  final String reference;
-  const _PaymentStatusDialog({required this.reference});
+  final bool success;
+  const _PaymentStatusDialog({required this.success});
 
   @override
   State<_PaymentStatusDialog> createState() => _PaymentStatusDialogState();
@@ -187,152 +208,83 @@ class _PaymentStatusDialog extends StatefulWidget {
 
 class _PaymentStatusDialogState extends State<_PaymentStatusDialog> {
   @override
+  void initState() {
+    super.initState();
+    Future.delayed(const Duration(seconds: 2), () {
+      if (mounted) {
+        final navigator = Navigator.of(context, rootNavigator: true);
+        if (navigator.canPop()) navigator.pop();
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return PopScope(
       canPop: false,
       child: AlertDialog(
-        content: StreamBuilder<DocumentSnapshot>(
-          stream: FirebaseFirestore.instance
-              .collection('orders')
-              .doc(widget.reference)
-              .snapshots(),
-          builder: (context, snapshot) {
-            final status = snapshot.data?['status'] as String?;
-
-            if (status == 'paid') {
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                if (mounted) _onSuccess(context);
-              });
-              return _buildSuccess();
-            }
-
-            if (status == 'failed') {
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                if (mounted) _onFailed(context);
-              });
-              return _buildFailed();
-            }
-
-            return _buildWaiting();
-          },
+        content: SizedBox(
+          width: 260,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 12),
+              if (widget.success) ...[
+                TweenAnimationBuilder<double>(
+                  tween: Tween(begin: 0.0, end: 1.0),
+                  duration: const Duration(milliseconds: 500),
+                  curve: Curves.elasticOut,
+                  builder: (_, scale, __) => Transform.scale(
+                    scale: scale,
+                    child: Container(
+                      width: 72,
+                      height: 72,
+                      decoration: const BoxDecoration(
+                        color: Color(0xFF22C55E),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.check, color: Colors.white, size: 40),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                const Text(
+                  'Payment Successful!',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: Color(0xFF22C55E)),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'Your money has been added.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 13, color: Colors.black54),
+                ),
+              ] else ...[
+                Container(
+                  width: 72,
+                  height: 72,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFEF4444),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.close, color: Colors.white, size: 40),
+                ),
+                const SizedBox(height: 20),
+                const Text(
+                  'Payment Failed',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: Color(0xFFEF4444)),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'Please try again.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 13, color: Colors.black54),
+                ),
+              ],
+              const SizedBox(height: 16),
+            ],
+          ),
         ),
       ),
     );
-  }
-
-  Widget _buildWaiting() {
-    return const SizedBox(
-      width: 260,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          SizedBox(height: 20),
-          SizedBox(width: 48, height: 48, child: CircularProgressIndicator(strokeWidth: 3)),
-          SizedBox(height: 24),
-          Text(
-            'Processing payment...',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-          ),
-          SizedBox(height: 8),
-          Text(
-            'Please wait while we confirm your transaction.',
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 13, color: Colors.black54),
-          ),
-          SizedBox(height: 12),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSuccess() {
-    return SizedBox(
-      width: 260,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const SizedBox(height: 12),
-          TweenAnimationBuilder<double>(
-            tween: Tween(begin: 0.0, end: 1.0),
-            duration: const Duration(milliseconds: 500),
-            curve: Curves.elasticOut,
-            builder: (_, scale, __) => Transform.scale(
-              scale: scale,
-              child: Container(
-                width: 72,
-                height: 72,
-                decoration: const BoxDecoration(
-                  color: Color(0xFF22C55E),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(Icons.check, color: Colors.white, size: 40),
-              ),
-            ),
-          ),
-          const SizedBox(height: 20),
-          const Text(
-            'Payment Successful!',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: Color(0xFF22C55E)),
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            'Your money has been added.',
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 13, color: Colors.black54),
-          ),
-          const SizedBox(height: 16),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildFailed() {
-    return SizedBox(
-      width: 260,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const SizedBox(height: 12),
-          Container(
-            width: 72,
-            height: 72,
-            decoration: const BoxDecoration(
-              color: Color(0xFFEF4444),
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(Icons.close, color: Colors.white, size: 40),
-          ),
-          const SizedBox(height: 20),
-          const Text(
-            'Payment Failed',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: Color(0xFFEF4444)),
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            'Please try again.',
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 13, color: Colors.black54),
-          ),
-          const SizedBox(height: 16),
-        ],
-      ),
-    );
-  }
-
-  void _onSuccess(BuildContext context) {
-    context.read<TransactionsProvider>().addTransaction(
-      Transaction(
-        id: widget.reference,
-        title: 'Money added',
-        amount: 0,
-        date: DateTime.now(),
-      ),
-    );
-    Navigator.of(context).pop();
-    Navigator.of(context).pop();
-  }
-
-  void _onFailed(BuildContext context) {
-    Navigator.of(context).pop();
   }
 }

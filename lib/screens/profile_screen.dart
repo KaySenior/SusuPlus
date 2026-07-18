@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
+import 'package:go_router/go_router.dart';
 import '../services/auth_service.dart';
 import 'profile_detail_screen.dart';
 import 'verification_status_screen.dart';
@@ -16,6 +17,15 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  String _displayName() {
+    final user = AuthService.getCurrentUser();
+    if (user?.displayName != null && user!.displayName!.isNotEmpty) {
+      return user.displayName!;
+    }
+    final email = user?.email ?? '';
+    return email.isNotEmpty ? email.split('@').first : 'User';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -23,7 +33,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       appBar: AppBar(
       backgroundColor: const Color(0xFFEEF2F9),
         elevation: 0,
-        leading: const BackButton(),
+        automaticallyImplyLeading: false,
         title: const Text(
           'Profile',
           style: TextStyle(fontSize: 18, color: Colors.black87, fontWeight: FontWeight.w500),
@@ -36,18 +46,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
           const SizedBox(height: 8),
           ListTile(
             contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-            leading: CircleAvatar(
-              radius: 28,
-              backgroundColor: Colors.grey[200],
-              backgroundImage: AuthService.getCurrentUser()?.photoURL != null
-                  ? NetworkImage(AuthService.getCurrentUser()!.photoURL!)
-                  : null,
-              child: AuthService.getCurrentUser()?.photoURL == null
-                  ? const Icon(PhosphorIcons.userCircle, size: 32, color: Colors.grey)
-                  : null,
+            leading: Hero(
+              tag: 'profileAvatar',
+              child: CircleAvatar(
+                radius: 28,
+                backgroundColor: Colors.grey[200],
+                backgroundImage: AuthService.getCurrentUser()?.photoURL != null
+                    ? NetworkImage(AuthService.getCurrentUser()!.photoURL!)
+                    : null,
+                child: AuthService.getCurrentUser()?.photoURL == null
+                    ? const Icon(PhosphorIcons.userCircle, size: 32, color: Colors.grey)
+                    : null,
+              ),
             ),
             title: Text(
-              AuthService.getCurrentUser()?.displayName ?? 'User',
+              _displayName(),
               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.black87),
             ),
             subtitle: const Text(
@@ -116,7 +129,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
           Padding(
             padding: const EdgeInsets.only(bottom: 24),
             child: TextButton(
-              onPressed: () {},
+              onPressed: () async {
+                await AuthService.signOut();
+                if (context.mounted) context.go('/');
+              },
               child: const Text(
                 'Log out',
                 style: TextStyle(color: Colors.red, fontSize: 16),

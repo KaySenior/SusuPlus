@@ -201,6 +201,10 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black87),
+          onPressed: () => context.go('/'),
+        ),
         title: const Text('Phone Sign In'),
         backgroundColor: Colors.white,
         foregroundColor: Colors.black87,

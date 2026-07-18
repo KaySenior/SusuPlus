@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -30,6 +31,18 @@ class AuthService {
       email: email,
       password: password,
     );
+  }
+
+  Future<void> saveUserProfile({
+    required String uid,
+    required String email,
+    required String ghanaCard,
+  }) async {
+    await FirebaseFirestore.instance.collection('users').doc(uid).set({
+      'email': email,
+      'ghanaCard': ghanaCard,
+      'createdAt': FieldValue.serverTimestamp(),
+    });
   }
 
   static Future<User?> signInWithGoogle() async {

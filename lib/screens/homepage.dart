@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:susu/provider/provider.dart';
 import 'package:susu/screens/profile_screen.dart';
 import 'package:susu/screens/transaction_screen.dart';
@@ -31,8 +32,24 @@ class AppColors {
   static const border = Color(0xFFE7E9F0);
 }
 
-class HomeTab extends StatelessWidget {
+class HomeTab extends StatefulWidget {
   const HomeTab({super.key});
+
+  @override
+  State<HomeTab> createState() => _HomeTabState();
+}
+
+class _HomeTabState extends State<HomeTab> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final uid = FirebaseAuth.instance.currentUser?.uid;
+      if (uid != null) {
+        context.read<TransactionsProvider>().fetchTransactions();
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -114,7 +131,7 @@ class _HomeScreenState extends State<HomeShell> {
                   iconAsset: 'assets/icons/money-wavy.svg',
                   title: 'Receive Money',
                   subtitle: 'Paid directly into your account',
-                  onTap: () {},
+                  onTap: () => context.go('/transfer'),
                 ),
                 _ActionTile(
                   iconAsset: 'assets/icons/wallet.svg',
