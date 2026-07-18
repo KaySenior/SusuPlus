@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
+import 'package:provider/provider.dart';
+import 'package:susu/provider/provider.dart';
 
 class TransactionScreen extends StatefulWidget {
   const TransactionScreen({super.key});
@@ -10,13 +13,13 @@ class TransactionScreen extends StatefulWidget {
 }
 
 class _TransactionScreenState extends State<TransactionScreen> {
-  bool transactions = false;
-
   @override
   Widget build(BuildContext context) {
+    final items = context.watch<TransactionsProvider>().transactions;
+
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: const Color(0xFFEEF2F9),
         elevation: 0,
         title: const Text(
           'Transactions',
@@ -24,8 +27,8 @@ class _TransactionScreenState extends State<TransactionScreen> {
         ),
         centerTitle: true,
       ),
-      backgroundColor: Colors.white,
-      body: !transactions
+      backgroundColor: const Color(0xFFEEF2F9),
+      body: items.isEmpty
           ? Center(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 40),
@@ -65,7 +68,67 @@ class _TransactionScreenState extends State<TransactionScreen> {
                 ),
               ),
             )
-          : const SizedBox.shrink(),
+          : ListView.builder(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              itemCount: items.length,
+              itemBuilder: (context, i) {
+                final tx = items.reversed.toList()[i];
+                final isCredit = tx.amount > 0;
+                return Container(
+                  margin: const EdgeInsets.symmetric(vertical: 6),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  padding: const EdgeInsets.all(14),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 44,
+                        height: 44,
+                        decoration: BoxDecoration(
+                          color: isCredit
+                              ? const Color(0xFF22C55E).withValues(alpha: 0.1)
+                              : const Color(0xFFEF4444).withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Icon(
+                          isCredit ? PhosphorIcons.arrowDown : PhosphorIcons.arrowUp,
+                          color: Colors.black,
+                          size: 22,
+                        ),
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(tx.title,
+                                style: const TextStyle(
+                                    fontSize: 15, fontWeight: FontWeight.w500)),
+                            const SizedBox(height: 2),
+                            Text(
+                              '${tx.date.day}/${tx.date.month}/${tx.date.year}',
+                              style: TextStyle(fontSize: 13, color: Colors.grey.shade500),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Text(
+                        isCredit
+                            ? '+₵${tx.amount.toStringAsFixed(2)}'
+                            : '-₵${tx.amount.toStringAsFixed(2)}',
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: isCredit ? const Color(0xFF22C55E) : Colors.black87,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
     );
   }
 }

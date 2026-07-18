@@ -1,0 +1,338 @@
+import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart' hide Transaction;
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import 'package:webview_flutter/webview_flutter.dart';
+import 'package:susu/provider/provider.dart';
+import 'package:susu/models/transaction.dart';
+import 'package:susu/services/paystack_service.dart';
+
+class PaymentScreen extends StatefulWidget {
+  final double amount;
+  const PaymentScreen({super.key, required this.amount});
+
+  @override
+  State<PaymentScreen> createState() => _PaymentScreenState();
+}
+
+class _PaymentScreenState extends State<PaymentScreen> {
+  late final String _reference;
+  late final String _email;
+
+  @override
+  void initState() {
+    super.initState();
+    _reference = PaystackService.generateReference();
+    _email = FirebaseAuth.instance.currentUser?.email ?? 'customer@susuplus.com';
+  }
+
+  Future<void> _startPayment() async {
+    final amountInPesewas = (widget.amount * 100).round();
+
+    try {
+      await _createPendingOrder(amountInPesewas);
+
+      final authUrl = await PaystackService.initializeTransaction(
+        email: _email,
+        amountInPesewas: amountInPesewas,
+        reference: _reference,
+      );
+
+      if (authUrl == null) {
+        if (mounted) _showError('Failed to initialize payment. Please try again.');
+        return;
+      }
+
+      if (!mounted) return;
+
+      await _showCheckout(authUrl);
+
+      final result = await PaystackService.verifyTransaction(reference: _reference);
+      if (result != null && result['status'] == 'success') {
+        await FirebaseFirestore.instance.collection('orders').doc(_reference).update({
+          'status': 'paid',
+          'paidAt': FieldValue.serverTimestamp(),
+        });
+      } else {
+        await FirebaseFirestore.instance.collection('orders').doc(_reference).update({
+          'status': 'failed',
+        });
+      }
+    } on PaystackException catch (e) {
+      if (mounted) _showError(e.message);
+    } catch (e) {
+      if (mounted) _showError('Something went wrong. Please try again.');
+    }
+  }
+
+  Future<void> _createPendingOrder(int amountInPesewas) async {
+    await FirebaseFirestore.instance.collection('orders').doc(_reference).set({
+      'reference': _reference,
+      'email': _email,
+      'amount': amountInPesewas,
+      'currency': 'GHS',
+      'status': 'pending',
+      'createdAt': FieldValue.serverTimestamp(),
+    });
+  }
+
+  Future<void> _showCheckout(String authUrl) async {
+    final controller = WebViewController()
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..loadRequest(Uri.parse(authUrl));
+
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => Scaffold(
+          appBar: AppBar(
+            backgroundColor: Colors.white,
+            elevation: 0,
+            title: const Text('Payment', style: TextStyle(color: Colors.black87)),
+            leading: IconButton(
+              icon: const Icon(Icons.close, color: Colors.black87),
+              onPressed: () => context.pop(),
+            ),
+          ),
+          body: WebViewWidget(controller: controller),
+        ),
+      ),
+    );
+
+    if (!mounted) return;
+    _showWaitingDialog();
+  }
+
+  void _showWaitingDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => _PaymentStatusDialog(reference: _reference),
+    );
+  }
+
+  void _showError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red.shade600,
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFFF5F7FA),
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black87),
+          onPressed: () => context.pop(),
+        ),
+        title: const Text(
+          'Add Money',
+          style: TextStyle(fontSize: 18, color: Colors.black87, fontWeight: FontWeight.w600),
+        ),
+        centerTitle: true,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          children: [
+            const Spacer(),
+            Text(
+              '₵${widget.amount.toStringAsFixed(2)}',
+              style: const TextStyle(fontSize: 42, fontWeight: FontWeight.w800, color: Colors.black87),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'You are about to add this amount to your wallet',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 15, color: Colors.black54),
+            ),
+            const Spacer(),
+            SizedBox(
+              width: double.infinity,
+              height: 52,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF1E6FD9),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  elevation: 0,
+                ),
+                onPressed: _startPayment,
+                child: const Text(
+                  'Confirm & Pay',
+                  style: TextStyle(fontSize: 17, color: Colors.white, fontWeight: FontWeight.w600),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _PaymentStatusDialog extends StatefulWidget {
+  final String reference;
+  const _PaymentStatusDialog({required this.reference});
+
+  @override
+  State<_PaymentStatusDialog> createState() => _PaymentStatusDialogState();
+}
+
+class _PaymentStatusDialogState extends State<_PaymentStatusDialog> {
+  @override
+  Widget build(BuildContext context) {
+    return PopScope(
+      canPop: false,
+      child: AlertDialog(
+        content: StreamBuilder<DocumentSnapshot>(
+          stream: FirebaseFirestore.instance
+              .collection('orders')
+              .doc(widget.reference)
+              .snapshots(),
+          builder: (context, snapshot) {
+            final status = snapshot.data?['status'] as String?;
+
+            if (status == 'paid') {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (mounted) _onSuccess(context);
+              });
+              return _buildSuccess();
+            }
+
+            if (status == 'failed') {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (mounted) _onFailed(context);
+              });
+              return _buildFailed();
+            }
+
+            return _buildWaiting();
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildWaiting() {
+    return const SizedBox(
+      width: 260,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SizedBox(height: 20),
+          SizedBox(width: 48, height: 48, child: CircularProgressIndicator(strokeWidth: 3)),
+          SizedBox(height: 24),
+          Text(
+            'Processing payment...',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+          ),
+          SizedBox(height: 8),
+          Text(
+            'Please wait while we confirm your transaction.',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 13, color: Colors.black54),
+          ),
+          SizedBox(height: 12),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSuccess() {
+    return SizedBox(
+      width: 260,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const SizedBox(height: 12),
+          TweenAnimationBuilder<double>(
+            tween: Tween(begin: 0.0, end: 1.0),
+            duration: const Duration(milliseconds: 500),
+            curve: Curves.elasticOut,
+            builder: (_, scale, __) => Transform.scale(
+              scale: scale,
+              child: Container(
+                width: 72,
+                height: 72,
+                decoration: const BoxDecoration(
+                  color: Color(0xFF22C55E),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.check, color: Colors.white, size: 40),
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
+          const Text(
+            'Payment Successful!',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: Color(0xFF22C55E)),
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            'Your money has been added.',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 13, color: Colors.black54),
+          ),
+          const SizedBox(height: 16),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFailed() {
+    return SizedBox(
+      width: 260,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const SizedBox(height: 12),
+          Container(
+            width: 72,
+            height: 72,
+            decoration: const BoxDecoration(
+              color: Color(0xFFEF4444),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(Icons.close, color: Colors.white, size: 40),
+          ),
+          const SizedBox(height: 20),
+          const Text(
+            'Payment Failed',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: Color(0xFFEF4444)),
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            'Please try again.',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 13, color: Colors.black54),
+          ),
+          const SizedBox(height: 16),
+        ],
+      ),
+    );
+  }
+
+  void _onSuccess(BuildContext context) {
+    context.read<TransactionsProvider>().addTransaction(
+      Transaction(
+        id: widget.reference,
+        title: 'Money added',
+        amount: 0,
+        date: DateTime.now(),
+      ),
+    );
+    Navigator.of(context).pop();
+    Navigator.of(context).pop();
+  }
+
+  void _onFailed(BuildContext context) {
+    Navigator.of(context).pop();
+  }
+}

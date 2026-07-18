@@ -1,4 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
+import '../services/auth_service.dart';
+import 'profile_detail_screen.dart';
+import 'verification_status_screen.dart';
+import 'notification_settings_screen.dart';
+import 'change_password_screen.dart';
+import 'delete_account_screen.dart';
+import 'transaction_limits_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -11,46 +19,41 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFEEF2F9),
       appBar: AppBar(
-        backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFEEF2F9),
         elevation: 0,
+        leading: const BackButton(),
         title: const Text(
           'Profile',
           style: TextStyle(fontSize: 18, color: Colors.black87, fontWeight: FontWeight.w500),
         ),
         centerTitle: true,
-        actions: [
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.notification_add_outlined, color: Colors.blue),
-            iconSize: 28,
-          ),
-        ],
+        actions: const [],
       ),
       body: Column(
         children: [
           const SizedBox(height: 8),
           ListTile(
             contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-            leading: ClipRRect(
-              borderRadius: BorderRadius.circular(100),
-              child: Image.asset(
-                'assets/images/profileImage.jpg',
-                height: 56,
-                width: 56,
-                fit: BoxFit.cover,
-              ),
+            leading: CircleAvatar(
+              radius: 28,
+              backgroundColor: Colors.grey[200],
+              backgroundImage: AuthService.getCurrentUser()?.photoURL != null
+                  ? NetworkImage(AuthService.getCurrentUser()!.photoURL!)
+                  : null,
+              child: AuthService.getCurrentUser()?.photoURL == null
+                  ? const Icon(PhosphorIcons.userCircle, size: 32, color: Colors.grey)
+                  : null,
             ),
-            title: const Text(
-              'Mr.Mark',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.black87),
+            title: Text(
+              AuthService.getCurrentUser()?.displayName ?? 'User',
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.black87),
             ),
             subtitle: const Text(
               'Show profile',
               style: TextStyle(fontSize: 14, color: Colors.blue),
             ),
-            trailing: const Icon(Icons.chevron_right, color: Colors.blue),
           ),
           const Divider(height: 32, indent: 16, endIndent: 16),
           const Padding(
@@ -58,8 +61,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
             child: Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                'Settings',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600, color: Colors.black87),
+                'Accounts',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400, color: Colors.grey),
               ),
             ),
           ),
@@ -67,31 +70,57 @@ class _ProfileScreenState extends State<ProfileScreen> {
           Expanded(
             child: ListView(
               children: [
-                _settingsTile(
-                  icon: 'assets/icons/user-circle.png',
-                  label: 'Personal information',
+                Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Material(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    child: Column(
+                      children: [
+                        _settingsTile(icon: PhosphorIcons.userCircle, label: 'Your profile', screen: const ProfileDetailScreen()),
+                        _settingsTile(icon: PhosphorIcons.shieldCheck, label: 'Account verification status', screen: const VerificationStatusScreen()),
+                      ],
+                    ),
+                  ),
                 ),
-                const Divider(height: 1, indent: 56, endIndent: 16),
-                _settingsTile(
-                  icon: 'assets/icons/money.png',
-                  label: 'Payment and payouts',
+                const SizedBox(height: 12),
+                const Padding(
+                  padding: EdgeInsets.only(left: 16),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      'Security',
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400, color: Colors.grey),
+                    ),
+                  ),
                 ),
-                const Divider(height: 1, indent: 56, endIndent: 16),
-                _settingsTile(
-                  icon: 'assets/icons/taxes.png',
-                  label: 'Taxes',
-                ),
-                const Divider(height: 1, indent: 56, endIndent: 16),
-                _settingsTile(
-                  icon: 'assets/icons/shield.png',
-                  label: 'Logic & security',
-                ),
-                const Divider(height: 1, indent: 56, endIndent: 16),
-                _settingsTile(
-                  icon: 'assets/icons/accessibility.png',
-                  label: 'Accessibility',
+                const SizedBox(height: 8),
+                Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Material(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    child: Column(
+                      children: [
+                        _settingsTile(icon: PhosphorIcons.bell, label: 'Notification', screen: const NotificationSettingsScreen()),
+                        _settingsTile(icon: PhosphorIcons.lock, label: 'Change password', screen: const ChangePasswordScreen()),
+                        _settingsTile(icon: PhosphorIcons.trash, label: 'Delete account', screen: const DeleteAccountScreen()),
+                        _settingsTile(icon: PhosphorIcons.arrowsLeftRight, label: 'Transaction limits', screen: const TransactionLimitsScreen()),
+                      ],
+                    ),
+                  ),
                 ),
               ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 24),
+            child: TextButton(
+              onPressed: () {},
+              child: const Text(
+                'Log out',
+                style: TextStyle(color: Colors.red, fontSize: 16),
+              ),
             ),
           ),
         ],
@@ -99,15 +128,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _settingsTile({required String icon, required String label}) {
+  Widget _settingsTile({required IconData icon, required String label, required Widget screen}) {
     return ListTile(
-      onTap: () {},
-      leading: Image.asset(icon, height: 24, width: 24),
+      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => screen)),
+      leading: Icon(icon, size: 24, color: Colors.black54),
       title: Text(
         label,
         style: const TextStyle(fontSize: 16, color: Colors.black87),
       ),
-      trailing: const Icon(Icons.chevron_right, color: Colors.blue),
     );
   }
 }

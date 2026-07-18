@@ -12,7 +12,7 @@ dependencies:
   flutter_native_splash: ^2.4.0
   flutter:
     sdk: flutter
-  flutter_svg: ^2.0.10 
+  flutter_svg: ^2.0.10
 
   
 
@@ -21,20 +21,22 @@ dependencies:
   go_router: ^17.2.3
   firebase_core: ^4.11.0
   firebase_auth: ^6.5.4
+  cloud_firestore: ^6.6.0
   google_sign_in: ^6.2.1
   phosphoricons_flutter: ^1.0.0
   mockito: ^5.6.4
   google_fonts: ^8.1.0
   provider: ^6.1.2
   http: ^1.6.0
+  crypto: ^3.0.6
   url_launcher: ^6.3.2
-  flutter_signin_button: ^2.1.1
-  google_sign_in_dartio: ^0.3.0
-  firebase_messaging: ^16.4.3
+  webview_flutter: ^4.12.0
+  uuid: ^4.5.1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_launcher_icons: ^0.14.3
 
   flutter_lints: ^5.0.0
 
@@ -45,29 +47,16 @@ flutter:
     - assets/images/final.jpg
     - assets/images/atom.png
     - assets/images/g_logo.png
-    - assets/images/arrow-left.svg
     - assets/404.json
     - assets/loading.json
-    - assets/images/profileImage.jpg
-    - assets/icons/arrowforprofile.png
-    - assets/icons/user-circle.png
-    - assets/icons/shield.png
-    - assets/icons/money.png
-    - assets/icons/taxes.png
-    - assets/icons/cash.png
-    - assets/icons/accessibility.png
-    - assets/icons/caret-right.svg
-    - assets/images/add_money.png
     - assets/icons/house.svg
-    - assets/icons/list.svg
-    - assets/icons/bell.svg
+    - assets/icons/plus.svg
     - assets/icons/scroll.svg
     - assets/icons/user.svg
-    - assets/images/money_transfer.png
-    - assets/icons/plus.svg
     - assets/icons/receipt.svg
     - assets/icons/money-wavy.svg
     - assets/icons/wallet.svg
+    - assets/icons/bell.svg
     - assets/icons/envelope.svg
 flutter_native_splash:
   color: "#ffffff"

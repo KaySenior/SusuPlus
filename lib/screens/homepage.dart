@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:susu/provider/provider.dart';
 import 'package:susu/screens/profile_screen.dart';
 import 'package:susu/screens/transaction_screen.dart';
 import 'package:susu/screens/transfer_screen.dart';
+import 'package:susu/screens/notification_settings_screen.dart';
 import 'package:susu/widgets/navbar.dart';
+import 'package:susu/models/transaction.dart';
 import '../core/notifier.dart';
 
 final List<Widget> pages = [
@@ -20,7 +23,7 @@ final List<Widget> pages = [
 class AppColors {
   static const primary = Color(0xFF2F6BFF);
   static const primaryDark = Color(0xFF1E4FD6);
-  static const bg = Color(0xFFF5F7FB);
+  static const bg = Color(0xFFEEF2F9);
   static const card = Colors.white;
   static const textDark = Color(0xFF16192B);
   static const textMuted = Color(0xFF8A8FA3);
@@ -56,9 +59,8 @@ class HomeShell extends StatefulWidget {
 class _HomeScreenState extends State<HomeShell> {
   @override
   Widget build(BuildContext context) {
-    final hasTransactions =
-        context.watch<TransactionsProvider>().hasTransactions;
     final balance = context.watch<TransactionsProvider>().balance;
+    final transactions = context.watch<TransactionsProvider>().transactions;
 
     return Scaffold(
       backgroundColor: AppColors.bg,
@@ -78,13 +80,19 @@ class _HomeScreenState extends State<HomeShell> {
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 12),
-            child: _IconBadge(
-              child: SvgPicture.asset(
-                'assets/icons/bell.svg',
-                colorFilter:
-                    const ColorFilter.mode(AppColors.primary, BlendMode.srcIn),
-                width: 20,
-                height: 20,
+            child: GestureDetector(
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const NotificationSettingsScreen()),
+              ),
+              child: _IconBadge(
+                child: SvgPicture.asset(
+                  'assets/icons/bell.svg',
+                  colorFilter:
+                      const ColorFilter.mode(AppColors.primary, BlendMode.srcIn),
+                  width: 20,
+                  height: 20,
+                ),
               ),
             ),
           ),
@@ -108,7 +116,6 @@ class _HomeScreenState extends State<HomeShell> {
                   subtitle: 'Paid directly into your account',
                   onTap: () {},
                 ),
-                const _TileDivider(),
                 _ActionTile(
                   iconAsset: 'assets/icons/wallet.svg',
                   title: 'Add Money',
@@ -120,12 +127,14 @@ class _HomeScreenState extends State<HomeShell> {
             const SizedBox(height: 28),
             _SectionHeader(title: 'Recently Paid'),
             const SizedBox(height: 12),
-            _RecentPaidCard(hasTransactions: hasTransactions),
+            _RecentPaidCard(
+              transactions: transactions,
+            ),
             const SizedBox(height: 28),
             _SectionHeader(title: 'Transactions'),
             const SizedBox(height: 12),
             _TransactionsCard(
-              hasTransactions: hasTransactions,
+              transactions: transactions,
               onMakeTransaction: () => context.go('/transfer'),
             ),
           ],
@@ -296,11 +305,15 @@ class _ActionTile extends StatelessWidget {
 }
 
 class _RecentPaidCard extends StatelessWidget {
-  final bool hasTransactions;
-  const _RecentPaidCard({required this.hasTransactions});
+  final List<Transaction> transactions;
+  const _RecentPaidCard({required this.transactions});
 
   @override
   Widget build(BuildContext context) {
+    final items = transactions.length > 3
+        ? transactions.sublist(transactions.length - 3)
+        : transactions;
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -308,9 +321,8 @@ class _RecentPaidCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: AppColors.border),
       ),
-      child: hasTransactions
-          ? const SizedBox.shrink() // replace with real list items
-          : Row(
+      child: items.isEmpty
+          ? Row(
               children: [
                 Container(
                   width: 44,
@@ -338,34 +350,91 @@ class _RecentPaidCard extends StatelessWidget {
                   ),
                 ),
               ],
+            )
+          : Column(
+              children: items.reversed.map((tx) => _txRow(tx)).toList(),
             ),
+    );
+  }
+
+  Widget _txRow(Transaction tx) {
+    final isCredit = tx.amount > 0;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: isCredit
+                  ? const Color(0xFF22C55E).withValues(alpha: 0.1)
+                  : const Color(0xFFEF4444).withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(
+              isCredit ? PhosphorIcons.arrowDown : PhosphorIcons.arrowUp,
+              color: Colors.black,
+              size: 20,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(tx.title,
+                    style: const TextStyle(
+                        fontSize: 14, fontWeight: FontWeight.w500)),
+                const SizedBox(height: 2),
+                Text(
+                  '${tx.date.day}/${tx.date.month}/${tx.date.year}',
+                  style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
+                ),
+              ],
+            ),
+          ),
+          Text(
+            isCredit ? '+₵${tx.amount.toStringAsFixed(2)}' : '-₵${tx.amount.toStringAsFixed(2)}',
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: isCredit ? const Color(0xFF22C55E) : Colors.black87,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
 
 class _TransactionsCard extends StatelessWidget {
-  final bool hasTransactions;
+  final List<Transaction> transactions;
   final VoidCallback onMakeTransaction;
 
   const _TransactionsCard({
-    required this.hasTransactions,
+    required this.transactions,
     required this.onMakeTransaction,
   });
 
   @override
   Widget build(BuildContext context) {
+    final items = transactions.length > 5
+        ? transactions.sublist(transactions.length - 5)
+        : transactions;
+
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 20),
+      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
       decoration: BoxDecoration(
         color: AppColors.card,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: AppColors.border),
       ),
-      child: hasTransactions
-          ? const SizedBox.shrink() // replace with real transaction list
-          : Column(
+      child: items.isEmpty
+          ? Column(
               children: [
+                const SizedBox(height: 16),
                 Container(
                   width: 60,
                   height: 60,
@@ -411,8 +480,85 @@ class _TransactionsCard extends StatelessWidget {
                     ),
                   ),
                 ),
+                const SizedBox(height: 8),
+              ],
+            )
+          : Column(
+              children: [
+                ...items.reversed.map((tx) => _txRow(tx)),
+                const Divider(height: 1),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton(
+                      onPressed: () {
+                        selectedPage.value = 2;
+                        context.go('/homepage');
+                      },
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: AppColors.primary),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: const Text('See all transactions',
+                          style: TextStyle(color: AppColors.primary)),
+                    ),
+                  ),
+                ),
               ],
             ),
+    );
+  }
+
+  Widget _txRow(Transaction tx) {
+    final isCredit = tx.amount > 0;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: isCredit
+                  ? const Color(0xFF22C55E).withValues(alpha: 0.1)
+                  : const Color(0xFFEF4444).withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(
+              isCredit ? PhosphorIcons.arrowDown : PhosphorIcons.arrowUp,
+              color: Colors.black,
+              size: 20,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(tx.title,
+                    style: const TextStyle(
+                        fontSize: 14, fontWeight: FontWeight.w500)),
+                const SizedBox(height: 2),
+                Text(
+                  '${tx.date.day}/${tx.date.month}/${tx.date.year}',
+                  style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
+                ),
+              ],
+            ),
+          ),
+          Text(
+            isCredit ? '+₵${tx.amount.toStringAsFixed(2)}' : '-₵${tx.amount.toStringAsFixed(2)}',
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: isCredit ? const Color(0xFF22C55E) : Colors.black87,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
