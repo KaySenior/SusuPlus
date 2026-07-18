@@ -1,9 +1,10 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
+import 'package:susu/config/env.dart';
 
 class MomoService {
-  static const String _secretKey = 'sk_test_872a8081e9d415c1e1325734749b63f49e42b7a4';
+  static const String _secretKey = AppEnv.paystackSecretKey;
 
   static Future<bool> makePayment({
     required String email,

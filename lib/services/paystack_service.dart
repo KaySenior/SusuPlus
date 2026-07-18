@@ -2,14 +2,13 @@ import 'dart:convert';
 import 'dart:developer' as dev;
 import 'package:http/http.dart' as http;
 import 'package:uuid/uuid.dart';
+import 'package:susu/config/env.dart';
 
 class PaystackService {
   PaystackService._();
 
-  static const String _secretKey =
-      'sk_live_REPLACED';
-  static const String _publicKey =
-      'pk_live_77d1360609ce17d3a199acdf43ffcd8e35605ef8';
+  static const String _secretKey = AppEnv.paystackSecretKey;
+  static const String _publicKey = AppEnv.paystackPublicKey;
 
   static String get publicKey => _publicKey;
 

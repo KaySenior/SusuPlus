@@ -58,3 +58,4 @@ ios/Runner/GoogleService-Info.plist
 local.properties
 susuplus_key.json
 *.json.key
+lib/config/env.dart
