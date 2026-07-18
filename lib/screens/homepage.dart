@@ -375,7 +375,9 @@ class _RecentPaidCard extends StatelessWidget {
   }
 
   Widget _txRow(Transaction tx) {
-    final isCredit = tx.amount > 0;
+    final isFailed = tx.status == 'failed';
+    final isCredit = tx.amount > 0 && !isFailed;
+    final isDebit = tx.amount < 0 && !isFailed;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
@@ -384,14 +386,20 @@ class _RecentPaidCard extends StatelessWidget {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: isCredit
-                  ? const Color(0xFF22C55E).withValues(alpha: 0.1)
-                  : const Color(0xFFEF4444).withValues(alpha: 0.1),
+              color: isFailed
+                  ? Colors.grey.shade100
+                  : isCredit
+                      ? const Color(0xFF22C55E).withValues(alpha: 0.1)
+                      : const Color(0xFFEF4444).withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(
-              isCredit ? PhosphorIcons.arrowDown : PhosphorIcons.arrowUp,
-              color: Colors.black,
+              isFailed
+                  ? PhosphorIcons.x
+                  : isCredit
+                      ? PhosphorIcons.arrowDown
+                      : PhosphorIcons.arrowUp,
+              color: isFailed ? Colors.grey : Colors.black,
               size: 20,
             ),
           ),
@@ -404,21 +412,38 @@ class _RecentPaidCard extends StatelessWidget {
                     style: const TextStyle(
                         fontSize: 14, fontWeight: FontWeight.w500)),
                 const SizedBox(height: 2),
-                Text(
-                  '${tx.date.day}/${tx.date.month}/${tx.date.year}',
-                  style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
+                Row(
+                  children: [
+                    Text(
+                      '${tx.date.day}/${tx.date.month}/${tx.date.year}',
+                      style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
+                    ),
+                    if (isFailed) ...[
+                      const SizedBox(width: 6),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFEF4444).withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: const Text('Failed',
+                            style: TextStyle(fontSize: 10, color: Color(0xFFEF4444), fontWeight: FontWeight.w500)),
+                      ),
+                    ],
+                  ],
                 ),
               ],
             ),
           ),
-          Text(
-            isCredit ? '+₵${tx.amount.toStringAsFixed(2)}' : '-₵${tx.amount.toStringAsFixed(2)}',
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: isCredit ? const Color(0xFF22C55E) : Colors.black87,
+          if (!isFailed && (isCredit || isDebit))
+            Text(
+              isCredit ? '+₵${tx.amount.toStringAsFixed(2)}' : '-₵${tx.amount.toStringAsFixed(2)}',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: isCredit ? const Color(0xFF22C55E) : Colors.black87,
+              ),
             ),
-          ),
         ],
       ),
     );
@@ -530,7 +555,9 @@ class _TransactionsCard extends StatelessWidget {
   }
 
   Widget _txRow(Transaction tx) {
-    final isCredit = tx.amount > 0;
+    final isFailed = tx.status == 'failed';
+    final isCredit = tx.amount > 0 && !isFailed;
+    final isDebit = tx.amount < 0 && !isFailed;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
@@ -539,14 +566,20 @@ class _TransactionsCard extends StatelessWidget {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: isCredit
-                  ? const Color(0xFF22C55E).withValues(alpha: 0.1)
-                  : const Color(0xFFEF4444).withValues(alpha: 0.1),
+              color: isFailed
+                  ? Colors.grey.shade100
+                  : isCredit
+                      ? const Color(0xFF22C55E).withValues(alpha: 0.1)
+                      : const Color(0xFFEF4444).withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(
-              isCredit ? PhosphorIcons.arrowDown : PhosphorIcons.arrowUp,
-              color: Colors.black,
+              isFailed
+                  ? PhosphorIcons.x
+                  : isCredit
+                      ? PhosphorIcons.arrowDown
+                      : PhosphorIcons.arrowUp,
+              color: isFailed ? Colors.grey : Colors.black,
               size: 20,
             ),
           ),
@@ -559,21 +592,38 @@ class _TransactionsCard extends StatelessWidget {
                     style: const TextStyle(
                         fontSize: 14, fontWeight: FontWeight.w500)),
                 const SizedBox(height: 2),
-                Text(
-                  '${tx.date.day}/${tx.date.month}/${tx.date.year}',
-                  style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
+                Row(
+                  children: [
+                    Text(
+                      '${tx.date.day}/${tx.date.month}/${tx.date.year}',
+                      style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
+                    ),
+                    if (isFailed) ...[
+                      const SizedBox(width: 6),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFEF4444).withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: const Text('Failed',
+                            style: TextStyle(fontSize: 10, color: Color(0xFFEF4444), fontWeight: FontWeight.w500)),
+                      ),
+                    ],
+                  ],
                 ),
               ],
             ),
           ),
-          Text(
-            isCredit ? '+₵${tx.amount.toStringAsFixed(2)}' : '-₵${tx.amount.toStringAsFixed(2)}',
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: isCredit ? const Color(0xFF22C55E) : Colors.black87,
+          if (!isFailed && (isCredit || isDebit))
+            Text(
+              isCredit ? '+₵${tx.amount.toStringAsFixed(2)}' : '-₵${tx.amount.toStringAsFixed(2)}',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: isCredit ? const Color(0xFF22C55E) : Colors.black87,
+              ),
             ),
-          ),
         ],
       ),
     );

@@ -81,6 +81,60 @@ class PaystackService {
     }
   }
 
+  static Future<Map<String, dynamic>?> finalizeTransfer({
+    required String transferCode,
+    required String otp,
+  }) async {
+    try {
+      final response = await http.post(
+        Uri.parse('https://api.paystack.co/transfer/finalize_transfer'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $_secretKey',
+        },
+        body: jsonEncode({
+          'transfer_code': transferCode,
+          'otp': otp,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return data['data'] as Map<String, dynamic>?;
+      }
+      return null;
+    } catch (e) {
+      dev.log('Paystack finalize transfer error: $e');
+      return null;
+    }
+  }
+
+  static Future<Map<String, dynamic>?> resendTransferOtp({
+    required String transferCode,
+  }) async {
+    try {
+      final response = await http.post(
+        Uri.parse('https://api.paystack.co/transfer/resend_otp'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $_secretKey',
+        },
+        body: jsonEncode({
+          'transfer_code': transferCode,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return data['data'] as Map<String, dynamic>?;
+      }
+      return null;
+    } catch (e) {
+      dev.log('Paystack resend OTP error: $e');
+      return null;
+    }
+  }
+
   static Future<Map<String, dynamic>?> verifyTransaction({
     required String reference,
   }) async {

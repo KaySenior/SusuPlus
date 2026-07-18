@@ -521,7 +521,30 @@ class _TransferScreenState extends State<TransferScreen> {
 
       if (!mounted) return;
 
-      final success = transfer != null && transfer['status'] == 'success';
+      String transferStatus = 'failed';
+      String? transferCode;
+
+      if (transfer != null) {
+        transferStatus = transfer['status'] as String? ?? 'failed';
+        transferCode = transfer['transfer_code'] as String?;
+
+        if (transferStatus == 'otp' && transferCode != null) {
+          final otp = await _showOtpDialog();
+          if (otp != null) {
+            final finalized = await PaystackService.finalizeTransfer(
+              transferCode: transferCode,
+              otp: otp,
+            );
+            if (finalized != null && finalized['status'] == 'success') {
+              transferStatus = 'success';
+            } else {
+              if (mounted) _showError('Invalid OTP. Please try again.');
+            }
+          }
+        }
+      }
+
+      final success = transferStatus == 'success';
 
       if (success) {
         await FirebaseFirestore.instance.collection('transfers').doc(reference).set({
@@ -581,6 +604,46 @@ class _TransferScreenState extends State<TransferScreen> {
     } finally {
       if (mounted) setState(() => _loading = false);
     }
+  }
+
+  Future<String?> _showOtpDialog() {
+    final otpController = TextEditingController();
+    return showDialog<String>(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Enter OTP'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text('An OTP has been sent to your phone. Enter it below to complete the transfer.'),
+            const SizedBox(height: 16),
+            TextField(
+              controller: otpController,
+              keyboardType: TextInputType.number,
+              maxLength: 6,
+              decoration: const InputDecoration(
+                labelText: 'OTP',
+                border: OutlineInputBorder(),
+                counterText: '',
+              ),
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 24, letterSpacing: 8),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(null),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.of(ctx).pop(otpController.text),
+            child: const Text('Confirm'),
+          ),
+        ],
+      ),
+    );
   }
 
   void _showError(String message) {
