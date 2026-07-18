@@ -71,11 +71,6 @@ class AuthService {
     required Function(String error) onError,
     required Function() onAutoVerified,
   }) async {
-    try {
-      await _auth.setSettings(appVerificationDisabledForTesting: true);
-    } catch (_) {
-      // Ignore — only works with whitelisted test numbers
-    }
     await _auth.verifyPhoneNumber(
       phoneNumber: phoneNumber,
       verificationCompleted: (phoneAuthCredential) async {

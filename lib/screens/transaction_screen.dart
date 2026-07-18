@@ -70,6 +70,7 @@ class _TransactionScreenState extends State<TransactionScreen> {
             )
           : ListView.builder(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              itemCount: items.length,
               itemBuilder: (context, i) {
                 final tx = items.reversed.toList()[i];
                 final isCredit = tx.amount > 0;
