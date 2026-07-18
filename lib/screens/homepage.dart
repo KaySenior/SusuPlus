@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:susu/provider/provider.dart';
 import 'package:susu/screens/profile_screen.dart';
 import 'package:susu/screens/transaction_screen.dart';
 import 'package:susu/screens/transfer_screen.dart';
+import 'package:susu/screens/notification_settings_screen.dart';
 import 'package:susu/widgets/navbar.dart';
 import 'package:susu/models/transaction.dart';
 import '../core/notifier.dart';
@@ -21,7 +23,7 @@ final List<Widget> pages = [
 class AppColors {
   static const primary = Color(0xFF2F6BFF);
   static const primaryDark = Color(0xFF1E4FD6);
-  static const bg = Color(0xFFF5F7FB);
+  static const bg = Color(0xFFEEF2F9);
   static const card = Colors.white;
   static const textDark = Color(0xFF16192B);
   static const textMuted = Color(0xFF8A8FA3);
@@ -78,13 +80,19 @@ class _HomeScreenState extends State<HomeShell> {
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 12),
-            child: _IconBadge(
-              child: SvgPicture.asset(
-                'assets/icons/bell.svg',
-                colorFilter:
-                    const ColorFilter.mode(AppColors.primary, BlendMode.srcIn),
-                width: 20,
-                height: 20,
+            child: GestureDetector(
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const NotificationSettingsScreen()),
+              ),
+              child: _IconBadge(
+                child: SvgPicture.asset(
+                  'assets/icons/bell.svg',
+                  colorFilter:
+                      const ColorFilter.mode(AppColors.primary, BlendMode.srcIn),
+                  width: 20,
+                  height: 20,
+                ),
               ),
             ),
           ),
@@ -108,7 +116,6 @@ class _HomeScreenState extends State<HomeShell> {
                   subtitle: 'Paid directly into your account',
                   onTap: () {},
                 ),
-                const _TileDivider(),
                 _ActionTile(
                   iconAsset: 'assets/icons/wallet.svg',
                   title: 'Add Money',
@@ -366,8 +373,8 @@ class _RecentPaidCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(
-              isCredit ? Icons.arrow_downward : Icons.arrow_upward,
-              color: isCredit ? const Color(0xFF22C55E) : const Color(0xFFEF4444),
+              isCredit ? PhosphorIcons.arrowDown : PhosphorIcons.arrowUp,
+              color: Colors.black,
               size: 20,
             ),
           ),
@@ -521,8 +528,8 @@ class _TransactionsCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(
-              isCredit ? Icons.arrow_downward : Icons.arrow_upward,
-              color: isCredit ? const Color(0xFF22C55E) : const Color(0xFFEF4444),
+              isCredit ? PhosphorIcons.arrowDown : PhosphorIcons.arrowUp,
+              color: Colors.black,
               size: 20,
             ),
           ),

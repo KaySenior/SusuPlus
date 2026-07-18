@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:susu/provider/provider.dart';
 
@@ -18,7 +19,7 @@ class _TransactionScreenState extends State<TransactionScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: const Color(0xFFEEF2F9),
         elevation: 0,
         title: const Text(
           'Transactions',
@@ -26,7 +27,7 @@ class _TransactionScreenState extends State<TransactionScreen> {
         ),
         centerTitle: true,
       ),
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFEEF2F9),
       body: items.isEmpty
           ? Center(
               child: Padding(
@@ -67,15 +68,18 @@ class _TransactionScreenState extends State<TransactionScreen> {
                 ),
               ),
             )
-          : ListView.separated(
+          : ListView.builder(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              itemCount: items.length,
-              separatorBuilder: (_, __) => const Divider(height: 1),
               itemBuilder: (context, i) {
                 final tx = items.reversed.toList()[i];
                 final isCredit = tx.amount > 0;
-                return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 12),
+                return Container(
+                  margin: const EdgeInsets.symmetric(vertical: 6),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  padding: const EdgeInsets.all(14),
                   child: Row(
                     children: [
                       Container(
@@ -88,8 +92,8 @@ class _TransactionScreenState extends State<TransactionScreen> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Icon(
-                          isCredit ? Icons.arrow_downward : Icons.arrow_upward,
-                          color: isCredit ? const Color(0xFF22C55E) : const Color(0xFFEF4444),
+                          isCredit ? PhosphorIcons.arrowDown : PhosphorIcons.arrowUp,
+                          color: Colors.black,
                           size: 22,
                         ),
                       ),

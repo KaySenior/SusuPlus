@@ -44,29 +44,16 @@ flutter:
     - assets/images/final.jpg
     - assets/images/atom.png
     - assets/images/g_logo.png
-    - assets/images/arrow-left.svg
     - assets/404.json
     - assets/loading.json
-    - assets/images/profileImage.jpg
-    - assets/icons/arrowforprofile.png
-    - assets/icons/user-circle.png
-    - assets/icons/shield.png
-    - assets/icons/money.png
-    - assets/icons/taxes.png
-    - assets/icons/cash.png
-    - assets/icons/accessibility.png
-    - assets/icons/caret-right.svg
-    - assets/images/add_money.png
     - assets/icons/house.svg
-    - assets/icons/list.svg
-    - assets/icons/bell.svg
+    - assets/icons/plus.svg
     - assets/icons/scroll.svg
     - assets/icons/user.svg
-    - assets/images/money_transfer.png
-    - assets/icons/plus.svg
     - assets/icons/receipt.svg
     - assets/icons/money-wavy.svg
     - assets/icons/wallet.svg
+    - assets/icons/bell.svg
     - assets/icons/envelope.svg
 flutter_native_splash:
   color: "#ffffff"
