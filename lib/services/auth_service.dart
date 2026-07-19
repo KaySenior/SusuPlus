@@ -65,6 +65,25 @@ class AuthService {
       final UserCredential userCredential =
           await _auth.signInWithCredential(credential);
 
+      final user = userCredential.user;
+      if (user != null) {
+        final doc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .get();
+        if (!doc.exists) {
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(user.uid)
+              .set({
+            'uid': user.uid,
+            'email': user.email,
+            'displayName': user.displayName,
+            'createdAt': FieldValue.serverTimestamp(),
+          });
+        }
+      }
+
       debugPrint('Successfully signed in: ${userCredential.user?.email}');
       return userCredential.user;
     } on FirebaseAuthException catch (e) {

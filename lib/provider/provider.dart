@@ -36,29 +36,39 @@ class TransactionsProvider extends ChangeNotifier {
 
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
-      final batch = FirebaseFirestore.instance.batch();
+      try {
+        final batch = FirebaseFirestore.instance.batch();
 
-      batch.set(
-        FirebaseFirestore.instance
-            .collection('users')
-            .doc(user.uid)
-            .collection('transactions')
-            .doc(tx.id),
-        {
-          'id': tx.id,
-          'title': tx.title,
-          'amount': tx.amount,
-          'date': tx.date.toIso8601String(),
-          'status': tx.status,
-        },
-      );
+        batch.set(
+          FirebaseFirestore.instance
+              .collection('users')
+              .doc(user.uid)
+              .collection('transactions')
+              .doc(tx.id),
+          {
+            'id': tx.id,
+            'title': tx.title,
+            'amount': tx.amount,
+            'date': tx.date.toIso8601String(),
+            'status': tx.status,
+          },
+        );
 
-      batch.update(
-        FirebaseFirestore.instance.collection('users').doc(user.uid),
-        {'balance': _balance},
-      );
+        batch.set(
+          FirebaseFirestore.instance.collection('users').doc(user.uid),
+          {'balance': _balance},
+          SetOptions(merge: true),
+        );
 
-      await batch.commit();
+        await batch.commit();
+      } catch (e) {
+        _transactions = _transactions.where((t) => t.id != tx.id).toList();
+        if (tx.status == 'completed') {
+          _balance -= tx.amount;
+        }
+        notifyListeners();
+        debugPrint('addTransaction error: $e');
+      }
     }
   }
 

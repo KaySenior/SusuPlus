@@ -41,17 +41,6 @@ class HomeTab extends StatefulWidget {
 
 class _HomeTabState extends State<HomeTab> {
   @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final uid = FirebaseAuth.instance.currentUser?.uid;
-      if (uid != null) {
-        context.read<TransactionsProvider>().fetchTransactions();
-      }
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.bg,
